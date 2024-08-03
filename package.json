@@ -1,16 +1,20 @@
 {
   "name": "mantabot",
-  "version": "0.0.1",
+  "version": "0.0.4",
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
+    "deploy": "node src/deploy-commands.js",
+    "path": "node src/set-paths.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "manta",
   "license": "ISC",
   "description": "",
   "devDependencies": {
-    "eslint": "^9.8.0"
+    "@eslint/js": "^9.8.0",
+    "eslint": "^9.8.0",
+    "globals": "^15.9.0"
   },
   "dependencies": {
     "discord.js": "^14.15.3"
