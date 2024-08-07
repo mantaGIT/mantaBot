@@ -6,7 +6,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const commands = [];
-const foldersPath = path.join(paths.src, 'commands')
+const foldersPath = path.join(paths.src, 'commands');
 const commandFolders = fs.readdirSync(foldersPath);
 
 for (const folder of commandFolders) {
@@ -17,7 +17,8 @@ for (const folder of commandFolders) {
 		const command = require(filePath);
 		if ('data' in command && 'execute' in command) {
 			commands.push(command.data.toJSON());
-		} else {
+		}
+		else {
 			console.log(`[WARNING] The command at ${filePath} is missing a required "data" or "execute" property.`);
 		}
 	}
@@ -34,13 +35,13 @@ const rest = new REST().setToken(token);
 
 		// The put method is used to fully refresh all commands in the guild with the current set
 		const data = await rest.put(
-			// Routes.applicationGuildCommands(clientId, guildId), // Guild commands
-            Routes.applicationCommands(clientId), // Global commands
+			// Routes.applicationGuildCommands(clientId, guildId),
+			Routes.applicationCommands(clientId),
 			{ body: commands },
 		);
-
 		console.log(`Successfully reloaded ${data.length} application (/) commands.`);
-	} catch (error) {
+	}
+	catch (error) {
 		// And of course, make sure you catch and log any errors!
 		console.error(error);
 	}
