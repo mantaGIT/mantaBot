@@ -1,13 +1,15 @@
+const { paths } = require('../config/paths.json');
+const { token } = require('../config/config.json');
+
 const fs = require('node:fs');
 const path = require('node:path');
 const { Client, Collection, GatewayIntentBits } =  require('discord.js');
-const { token } = require('../config/config.json');
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 
 client.commands = new Collection();
-const foldersPath = path.join(__dirname, 'commands');
+const foldersPath = path.join(paths.src, 'commands');
 const commandFolders = fs.readdirSync(foldersPath)
 
 for (const folder of commandFolders) {
@@ -24,7 +26,7 @@ for (const folder of commandFolders) {
     }
 }
 
-const eventsPath = path.join(__dirname, 'events');
+const eventsPath = path.join(paths.src, 'events');
 const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
 
 for (const file of eventFiles) {
