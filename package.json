@@ -1,11 +1,12 @@
 {
   "name": "mantabot",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
     "deploy": "node src/deploy-commands.js",
     "path": "node src/set-paths.js",
+    "data": "node src/data/generate-schedule-files.js",
     "test": "node src/test.js"
   },
   "author": "manta",
@@ -17,6 +18,7 @@
     "globals": "^15.9.0"
   },
   "dependencies": {
-    "discord.js": "^14.15.3"
+    "discord.js": "^14.15.3",
+    "lodash": "^4.17.21"
   }
 }
