@@ -2,33 +2,38 @@ const { paths } = require('../../../config/paths.json');
 const { SlashCommandBuilder } = require('discord.js');
 const fs = require('node:fs');
 const path = require('node:path');
+const { MODE } = require(path.join(paths.src, 'data/schedule-data.js'));
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('현재스케줄')
-		.setDescription('현재 카오폴리스 오픈 스케줄 정보를 알려줍니다.'),
+		.setDescription('현재 스플래툰3 스케줄 정보를 알려줍니다.')
+		.addStringOption(option =>
+			option.setName('mode')
+				.setDescription('원하는 게임 모드를 선택합니다. ex.레귤러, 오픈')
+				.setRequired(true)
+				.addChoices(
+					{ name: '레귤러', value: 'REGULAR' },
+					{ name: '챌린지', value: 'CHALLENGE' },
+					{ name: '오픈', value: 'OPEN' },
+					{ name: '엑매', value: 'X' },
+				)),
 	async execute(interaction) {
-		const schedulesFilePath = path.join(paths.resources, 'data/schedules.json');
+		const mode = MODE[interaction.options.getString('mode')];
+
+		const schedulesFilePath = path.join(paths.resources, `data/${mode.id}.json`);
 		const schedulesFile = fs.readFileSync(schedulesFilePath);
 		const schedules = JSON.parse(schedulesFile);
 
-		function Schedule(st, et, rule, maps) {
-			this.startTime = st;
-			this.endTime = et;
-			this.rule = rule;
-			this.maps = maps;
-		}
-
-		const schedulesOpen = [];
-		for (const node of schedules.data.bankaraSchedules.nodes) {
-			const maps = node.bankaraMatchSettings[1].vsStages.map(x => x.vsStageId);
-			const schedule = new Schedule(node.startTime, node.endTime, node.bankaraMatchSettings[1].vsRule.name, maps);
-			// console.log(schedule);
-			schedulesOpen.push(schedule);
-		}
-
-		const curr = schedulesOpen[0];
-		const msg = `${new Date(curr.startTime)} ~ ${new Date(curr.endTime)}\n룰: ${curr.rule}\n맵: ${curr.maps[0]}, ${curr.maps[1]}`;
+		const curr = schedules[0];
+		const dateFormat = {
+			dateStyle: 'long',
+			timeStyle: 'short',
+			timeZone: 'Asia/Seoul',
+		};
+		const startTime = new Intl.DateTimeFormat('ko-KR', dateFormat).format(new Date(curr.startTime));
+		const endTime = new Intl.DateTimeFormat('ko-KR', dateFormat).format(new Date(curr.endTime));
+		const msg = `모드: ${curr.mode}\n${startTime} ~ ${endTime}\n룰: ${curr.rule.name}\n맵: ${curr.stages[0].name}, ${curr.stages[1].name}`;
 		// console.log(msg);
 		await interaction.reply(msg);
 	},
