@@ -1,12 +1,14 @@
-const { paths } = require('../config/paths.json');
-const { clientId, token } = require('../config/config.json');
+const process = require('node:process');
+require('dotenv').config();
+
+const { clientId, token } = require(process.env.CONFIG);
 
 const { REST, Routes } = require('discord.js');
 const fs = require('node:fs');
 const path = require('node:path');
 
 const commands = [];
-const foldersPath = path.join(paths.src, 'commands');
+const foldersPath = path.join(process.env.SCRIPTS, 'commands');
 const commandFolders = fs.readdirSync(foldersPath);
 
 for (const folder of commandFolders) {
