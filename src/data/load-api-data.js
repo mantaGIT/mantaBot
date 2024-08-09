@@ -5,11 +5,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 module.exports = {
-	API_DATA: Object.freeze({
-		LANG: 'ko-KR.json',
-		SCHED: 'schedules.json',
-	}),
-	loadData(fileName) {
+	loadLocalApiData(fileName) {
 		const dataFolderPath = path.join(process.env.RESOURCES, 'data');
 		const dataFilePath = path.join(dataFolderPath, fileName);
 		const dataFile = fs.readFileSync(dataFilePath);

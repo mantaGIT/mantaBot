@@ -1,8 +1,17 @@
-const { API_DATA, loadData } = require('./load-api-data.js');
-const { MODE, generateData } = require('./schedule-data.js');
+const process = require('node:process');
+require('dotenv').config();
 
-const schedules = loadData(API_DATA.SCHED).data;
-generateData(schedules, MODE.REGULAR);
-generateData(schedules, MODE.CHALLENGE);
-generateData(schedules, MODE.OPEN);
-generateData(schedules, MODE.X);
+const { loadLocalApiData } = require('./load-api-data.js');
+const { generateData } = require('./schedule-data.js');
+
+const { GAMEMODE } = require(process.env.API_DATA_SCHEMA);
+
+
+const schedules = loadLocalApiData('schedules.json').data;
+// console.log(schedules);
+generateData(schedules, GAMEMODE.REGULAR);
+generateData(schedules, GAMEMODE.CHALLENGE);
+generateData(schedules, GAMEMODE.OPEN);
+generateData(schedules, GAMEMODE.X);
+
+console.log('Generate schedule data files by gamemode.');

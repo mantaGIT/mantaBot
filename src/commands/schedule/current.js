@@ -1,10 +1,14 @@
 const process = require('node:process');
 require('dotenv').config();
 
+const { stages, rules } = require(process.env.LANGUAGE);
+const { gamemode } = require(process.env.GAMEMODE_KR);
+const _ = require('lodash');
+
 const { SlashCommandBuilder } = require('discord.js');
 const fs = require('node:fs');
 const path = require('node:path');
-const { MODE } = require(path.join(process.env.RESOURCES, 'data/schedule-data.js'));
+const { GAMEMODE } = require(process.env.API_DATA_SCHEMA);
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -21,9 +25,10 @@ module.exports = {
 					{ name: '엑매', value: 'X' },
 				)),
 	async execute(interaction) {
-		const mode = MODE[interaction.options.getString('mode')];
+		// const mode = GAMEMODE['REGULAR'];
+		const optionValue = GAMEMODE[interaction.options.getString('mode')];
 
-		const schedulesFilePath = path.join(process.env.RESOURCES, `data/${mode.id}.json`);
+		const schedulesFilePath = path.join(process.env.RESOURCES, `data/${optionValue.id}.json`);
 		const schedulesFile = fs.readFileSync(schedulesFilePath);
 		const schedules = JSON.parse(schedulesFile);
 
@@ -33,9 +38,13 @@ module.exports = {
 			timeStyle: 'short',
 			timeZone: 'Asia/Seoul',
 		};
+		const mode = _.get(gamemode, `${curr.mode}.name`);
 		const startTime = new Intl.DateTimeFormat('ko-KR', dateFormat).format(new Date(curr.startTime));
 		const endTime = new Intl.DateTimeFormat('ko-KR', dateFormat).format(new Date(curr.endTime));
-		const msg = `모드: ${curr.mode}\n${startTime} ~ ${endTime}\n룰: ${curr.rule.name}\n맵: ${curr.stages[0].name}, ${curr.stages[1].name}`;
+		const rule = _.get(rules, `${curr.rule.id}.name`);
+		const [ stage1, stage2 ] = curr.stages.map(x => _.get(stages, `${x.id}.name`));
+
+		const msg = `모드: ${mode}\n${startTime} ~ ${endTime}\n룰: ${rule}\n맵: ${stage1}, ${stage2}`;
 		// console.log(msg);
 		await interaction.reply(msg);
 	},
