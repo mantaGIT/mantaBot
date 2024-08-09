@@ -13,7 +13,14 @@ module.exports = {
 		}
 
 		try {
-			console.log(`[${new Date(Date.now())}] call /${interaction.commandName} command`);
+			const dateFormat = {
+				dateStyle: 'medium',
+				timeStyle: 'medium',
+				timeZone: 'Asia/Seoul',
+				hour12: false,
+			};
+			const currTime = new Intl.DateTimeFormat('ko-KR', dateFormat).format(new Date(Date.now()));
+			console.log(`[${currTime}] call /${interaction.commandName} command`);
 			await command.execute(interaction);
 		}
 		catch (error) {
