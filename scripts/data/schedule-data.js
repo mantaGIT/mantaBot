@@ -8,7 +8,7 @@ const path = require('node:path');
 const { Schedule } = require(process.env.SCHED_DATA_SCHEMA);
 
 module.exports = {
-	generateData(apiData, gamemode) {
+	createScheduleData(apiData, gamemode) {
 		const nodes = _.get(apiData, gamemode.tag).nodes;
 		const startTimes = _.map(nodes, 'startTime');
 		const endTimes = _.map(nodes, 'endTime');

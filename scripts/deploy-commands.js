@@ -8,7 +8,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const commands = [];
-const foldersPath = path.join(process.env.SRC, 'commands');
+const foldersPath = path.join(process.env.SCRIPTS, 'commands');
 const commandFolders = fs.readdirSync(foldersPath);
 
 for (const folder of commandFolders) {

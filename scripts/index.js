@@ -11,7 +11,7 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 
 client.commands = new Collection();
-const foldersPath = path.join(process.env.SRC, 'commands');
+const foldersPath = path.join(process.env.SCRIPTS, 'commands');
 const commandFolders = fs.readdirSync(foldersPath);
 
 for (const folder of commandFolders) {
@@ -29,7 +29,7 @@ for (const folder of commandFolders) {
 	}
 }
 
-const eventsPath = path.join(process.env.SRC, 'events');
+const eventsPath = path.join(process.env.SCRIPTS, 'events');
 const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
 
 for (const file of eventFiles) {

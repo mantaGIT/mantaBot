@@ -1,12 +1,12 @@
 {
   "name": "mantabot",
   "version": "0.1.2",
-  "main": "src/index.js",
+  "main": "scripts/index.js",
   "scripts": {
-    "start": "node src/index.js",
-    "deploy": "node src/deploy-commands.js",
-    "data": "node src/data/generate-schedule-files.js",
-    "test": "node src/test.js"
+    "start": "node scripts/index.js",
+    "deploy": "node scripts/deploy-commands.js",
+    "data": "node scripts/data/create-data-files.js",
+    "test": "node scripts/test.js"
   },
   "author": "manta",
   "license": "ISC",
