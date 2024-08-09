@@ -1,8 +1,10 @@
-const { paths } = require('../../../config/paths.json');
+const process = require('node:process');
+require('dotenv').config();
+
 const { SlashCommandBuilder } = require('discord.js');
 const fs = require('node:fs');
 const path = require('node:path');
-const { MODE } = require(path.join(paths.src, 'data/schedule-data.js'));
+const { MODE } = require(path.join(process.env.RESOURCES, 'data/schedule-data.js'));
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -21,7 +23,7 @@ module.exports = {
 	async execute(interaction) {
 		const mode = MODE[interaction.options.getString('mode')];
 
-		const schedulesFilePath = path.join(paths.resources, `data/${mode.id}.json`);
+		const schedulesFilePath = path.join(process.env.RESOURCES, `data/${mode.id}.json`);
 		const schedulesFile = fs.readFileSync(schedulesFilePath);
 		const schedules = JSON.parse(schedulesFile);
 

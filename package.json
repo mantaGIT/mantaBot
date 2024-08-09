@@ -1,11 +1,10 @@
 {
   "name": "mantabot",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
     "deploy": "node src/deploy-commands.js",
-    "path": "node src/set-paths.js",
     "data": "node src/data/generate-schedule-files.js",
     "test": "node src/test.js"
   },
@@ -19,6 +18,7 @@
   },
   "dependencies": {
     "discord.js": "^14.15.3",
+    "dotenv": "^16.4.5",
     "lodash": "^4.17.21"
   }
 }

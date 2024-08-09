@@ -1,7 +1,9 @@
+const process = require('node:process');
+require('dotenv').config();
+
 const _ = require('lodash');
 const fs = require('node:fs');
 const path = require('node:path');
-const { paths } = require('../../config/paths.json');
 
 
 function Schedule(mode, st, et, rule, stages) {
@@ -33,7 +35,7 @@ module.exports = {
 		const data = Array.from({ length: nodes.length })
 			.map((x, i) => x = new Schedule(mode.id, startTimes[i], endTimes[i], rules[i], stagesArr[i]));
 
-		const dataFilePath = path.join(paths.resources, `data/${mode.id}.json`);
+		const dataFilePath = path.join(process.env.RESOURCES, `data/${mode.id}.json`);
 		fs.writeFileSync(dataFilePath, JSON.stringify(data, null, 4));
 		return data;
 	},

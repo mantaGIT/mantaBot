@@ -1,5 +1,7 @@
-const { paths } = require('../config/paths.json');
-const { token } = require('../config/config.json');
+const process = require('node:process');
+require('dotenv').config();
+
+const { token } = require(process.env.CONFIG);
 
 const fs = require('node:fs');
 const path = require('node:path');
@@ -9,7 +11,7 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 
 client.commands = new Collection();
-const foldersPath = path.join(paths.src, 'commands');
+const foldersPath = path.join(process.env.SRC, 'commands');
 const commandFolders = fs.readdirSync(foldersPath);
 
 for (const folder of commandFolders) {
@@ -27,7 +29,7 @@ for (const folder of commandFolders) {
 	}
 }
 
-const eventsPath = path.join(paths.src, 'events');
+const eventsPath = path.join(process.env.SRC, 'events');
 const eventFiles = fs.readdirSync(eventsPath).filter(file => file.endsWith('.js'));
 
 for (const file of eventFiles) {
