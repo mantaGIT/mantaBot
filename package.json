@@ -1,11 +1,11 @@
 {
   "name": "mantabot",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "main": "scripts/index.js",
   "scripts": {
     "start": "node scripts/index.js",
     "deploy": "node scripts/deploy-commands.js",
-    "data": "node scripts/data/create-data-files.js",
+    "data": "node scripts/data/create-schedules-files.js",
     "test": "node scripts/test.js"
   },
   "author": "manta",

@@ -21,7 +21,7 @@ module.exports = {
 		const data = Array.from({ length: nodes.length })
 			.map((x, i) => x = new Schedule(gamemode.id, startTimes[i], endTimes[i], rules[i], stagesArr[i]));
 
-		const dataFilePath = path.join(process.env.RESOURCES, `data/${gamemode.id}.json`);
+		const dataFilePath = path.join(process.env.RESOURCES, `data/schedules/${gamemode.id}.json`);
 		fs.writeFileSync(dataFilePath, JSON.stringify(data, null, 2));
 		return data;
 	},

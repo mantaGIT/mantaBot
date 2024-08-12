@@ -28,7 +28,7 @@ module.exports = {
 		// const mode = GAMEMODE['REGULAR'];
 		const optionValue = GAMEMODE[interaction.options.getString('mode')];
 
-		const schedulesFilePath = path.join(process.env.RESOURCES, `data/${optionValue.id}.json`);
+		const schedulesFilePath = path.join(process.env.RESOURCES, `data/schedules/${optionValue.id}.json`);
 		const schedulesFile = fs.readFileSync(schedulesFilePath);
 		const schedules = JSON.parse(schedulesFile);
 

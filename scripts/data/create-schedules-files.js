@@ -7,7 +7,7 @@ const { createScheduleData } = require('./schedule-data.js');
 const { GAMEMODE } = require(process.env.API_DATA_SCHEMA);
 
 
-const schedules = loadLocalApiData('schedules.json').data;
+const schedules = loadLocalApiData('apiData.json').data;
 // console.log(schedules);
 createScheduleData(schedules, GAMEMODE.REGULAR);
 createScheduleData(schedules, GAMEMODE.CHALLENGE);
