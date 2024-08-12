@@ -44,8 +44,8 @@ for (const file of eventFiles) {
 }
 
 // execute a schedule-data-fetch timer
-const timer = require(path.join(process.env.SCRIPTS, 'data/readFile-timer.js'));
-timer.readFromLocalApiData();
-timer.createReadFileTimer();
+const timer = require(path.join(process.env.SCRIPTS, 'data/REST-api-timer.js'));
+timer.fetchApiData();
+timer.createFetchApiTimer();
 
 client.login(token);
