@@ -43,8 +43,9 @@ for (const file of eventFiles) {
 	}
 }
 
-// execute a schedule data generation timer
-const { callCounts, createDataTimer } = require(path.join(process.env.SCRIPTS, 'data/create-schedules-timer.js'));
-createDataTimer(callCounts);
+// execute a schedule-data-fetch timer
+const timer = require(path.join(process.env.SCRIPTS, 'data/readFile-timer.js'));
+timer.readFromLocalApiData();
+timer.createReadFileTimer();
 
 client.login(token);
