@@ -7,6 +7,7 @@ const { loadLocalApiData } = require('./api-data.js');
 const { createScheduleData } = require('./schedule-data.js');
 
 const { GAMEMODE } = require(process.env.API_DATA_SCHEMA);
+const log = require(process.env.LOGMSG);
 
 function createSchedulesFromApiData(fileName, callCounts) {
 	const apiData = loadLocalApiData(fileName).data;
@@ -18,18 +19,13 @@ function createSchedulesFromApiData(fileName, callCounts) {
 }
 
 module.exports = {
-	createDataTimer() {
-		const dateFormat = {
-			dateStyle: 'medium',
-			timeStyle: 'medium',
-			timeZone: 'Asia/Seoul',
-			hour12: false,
-		};
-		let callCounts = 0;
+	callCounts: 0,
+	createDataTimer(callCounts) {
+		log.printLogMsg('Register schedules-data-generation timer.');
 		schedule.scheduleJob('0 * * * * *', () => {
 			createSchedulesFromApiData('apiData.json', callCounts);
-			const date = new Intl.DateTimeFormat('ko-KR', dateFormat).format(new Date(Date.now()));
-			console.log(`[${date}] ${callCounts++}: Generate schedule data files by gamemode.`);
+			const msg = `Generate schedule data files by gamemode. : ${callCounts++}`;
+			log.printLogMsg(msg);
 		});
 	},
 };

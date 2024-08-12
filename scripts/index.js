@@ -44,7 +44,7 @@ for (const file of eventFiles) {
 }
 
 // execute a schedule data generation timer
-const { createDataTimer } = require(path.join(process.env.SCRIPTS, 'data/create-schedules-timer.js'));
-createDataTimer();
+const { callCounts, createDataTimer } = require(path.join(process.env.SCRIPTS, 'data/create-schedules-timer.js'));
+createDataTimer(callCounts);
 
 client.login(token);
