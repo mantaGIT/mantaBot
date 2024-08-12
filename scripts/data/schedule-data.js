@@ -8,7 +8,7 @@ const path = require('node:path');
 const { Schedule } = require(process.env.SCHED_DATA_SCHEMA);
 
 module.exports = {
-	createScheduleData(apiData, gamemode) {
+	createScheduleData(apiData, gamemode, slice = 0) {
 		const nodes = _.get(apiData, gamemode.tag).nodes;
 		const startTimes = _.map(nodes, 'startTime');
 		const endTimes = _.map(nodes, 'endTime');
@@ -19,7 +19,8 @@ module.exports = {
 		const rules = _.map(setting, 'vsRule');
 		const stagesArr = _.map(setting, 'vsStages');
 		const data = Array.from({ length: nodes.length })
-			.map((x, i) => x = new Schedule(gamemode.id, startTimes[i], endTimes[i], rules[i], stagesArr[i]));
+			.map((x, i) => x = new Schedule(gamemode.id, startTimes[i], endTimes[i], rules[i], stagesArr[i]))
+			.slice(slice);
 
 		const dataFilePath = path.join(process.env.RESOURCES, `data/schedules/${gamemode.id}.json`);
 		fs.writeFileSync(dataFilePath, JSON.stringify(data, null, 2));
