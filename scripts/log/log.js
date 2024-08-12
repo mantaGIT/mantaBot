@@ -14,7 +14,7 @@ module.exports = {
 		const date = new Intl.DateTimeFormat('ko-KR', this.dateFormat).format(Date.now());
 		console.log(`[${date}] ${msg}`);
 	},
-	// 로그파일 경로를 사전에 환경변수 LOG로 지정해야 함
+	// 로그파일 생성 후 경로를 사전에 환경변수 LOG로 지정해야 함
 	writeLogMsg(msg) {
 		const logFile = fs.readFileSync(process.env.LOG);
 		const date = new Intl.DateTimeFormat('ko-KR', this.dateFormat).format(Date.now());
