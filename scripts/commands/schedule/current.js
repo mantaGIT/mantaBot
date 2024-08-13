@@ -32,7 +32,7 @@ module.exports = {
 		const schedulesFile = fs.readFileSync(schedulesFilePath);
 		const schedules = JSON.parse(schedulesFile);
 
-		const curr = schedules[0];
+		const curr = schedules.find((schedule) => Date.now() < new Date(schedule.endTime));
 		const dateFormat = {
 			dateStyle: 'long',
 			timeStyle: 'short',

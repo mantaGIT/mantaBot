@@ -7,29 +7,28 @@ const { createScheduleData } = require('./schedule-data.js');
 
 const { GAMEMODE } = require(process.env.API_DATA_SCHEMA);
 const log = require(process.env.LOGMSG);
-const { urlLocal } = require(process.env.CONFIG);
-// const { url } = require(process.env.CONFIG);
 
 
 module.exports = {
-	fetchCounts: 0,
-	fetchApiData() {
-		const url = urlLocal;
+	fetchApiData(url) {
 		fetch(url)
 			.then(response => response.json())
 			.then(apiData => {
-				createScheduleData(apiData.data, GAMEMODE.REGULAR, this.fetchCounts);
-				createScheduleData(apiData.data, GAMEMODE.OPEN, this.fetchCounts);
-				createScheduleData(apiData.data, GAMEMODE.CHALLENGE, this.fetchCounts);
-				createScheduleData(apiData.data, GAMEMODE.X, this.fetchCounts);
-				log.printLogMsg('Update schedule data files by gamemode.');
-				this.fetchCounts++;
+				createScheduleData(apiData.data, GAMEMODE.REGULAR);
+				createScheduleData(apiData.data, GAMEMODE.OPEN);
+				createScheduleData(apiData.data, GAMEMODE.CHALLENGE);
+				createScheduleData(apiData.data, GAMEMODE.X);
+				log.printLog('Update schedule data files by gamemode.');
+			})
+			.catch((error) => {
+				log.printError(error);
 			});
 	},
-	createFetchApiTimer() {
-		log.printLogMsg('Register fetch-api-data timer.');
-		schedule.scheduleJob('*/30 * * * * *', () => {
-			this.fetchApiData();
+	createFetchApiTimer(url) {
+		log.printLog('Register fetch-api-data timer.');
+		// 홀수 시 3분마다 API 데이터 가져옴
+		schedule.scheduleJob('3 1-23/2 * * *', () => {
+			this.fetchApiData(url);
 		});
 	},
 };

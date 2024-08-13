@@ -44,8 +44,11 @@ for (const file of eventFiles) {
 }
 
 // execute a schedule-data-fetch timer
+// const { urlLocal } = require(process.env.CONFIG);
+const { url } = require(process.env.CONFIG);
 const timer = require(path.join(process.env.SCRIPTS, 'data/REST-api-timer.js'));
-timer.fetchApiData();
-timer.createFetchApiTimer();
+
+timer.fetchApiData(url);
+timer.createFetchApiTimer(url);
 
 client.login(token);
