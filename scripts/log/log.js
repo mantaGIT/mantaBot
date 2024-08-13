@@ -10,12 +10,16 @@ module.exports = {
 		timeZone: 'Asia/Seoul',
 		hour12: false,
 	},
-	printLogMsg(msg) {
+	printError(error) {
+		const date = new Intl.DateTimeFormat('ko-KR', this.dateFormat).format(Date.now());
+		console.error(`[${date}]`, error);
+	},
+	printLog(msg) {
 		const date = new Intl.DateTimeFormat('ko-KR', this.dateFormat).format(Date.now());
 		console.log(`[${date}] ${msg}`);
 	},
 	// 로그파일 생성 후 경로를 사전에 환경변수 LOG로 지정해야 함
-	writeLogMsg(msg) {
+	writeLog(msg) {
 		const logFile = fs.readFileSync(process.env.LOG);
 		const date = new Intl.DateTimeFormat('ko-KR', this.dateFormat).format(Date.now());
 		fs.writeFileSync(process.env.LOG, [logFile.toString(), `[${date}] ${msg}`].join('\n'));

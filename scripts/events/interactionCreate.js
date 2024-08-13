@@ -17,7 +17,7 @@ module.exports = {
 		}
 
 		try {
-			log.printLogMsg(`Call /${interaction.commandName} command.`);
+			log.printLog(`Call /${interaction.commandName} command.`);
 			await command.execute(interaction);
 		}
 		catch (error) {

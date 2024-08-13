@@ -9,6 +9,6 @@ module.exports = {
 	name: Events.ClientReady,
 	once: true,
 	execute(client) {
-		log.printLogMsg(`Ready! Logged in as ${client.user.tag}`);
+		log.printLog(`Ready! Logged in as ${client.user.tag}`);
 	},
 };
