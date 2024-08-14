@@ -1,6 +1,6 @@
 {
   "name": "mantabot",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "main": "scripts/index.js",
   "scripts": {
     "start": "node scripts/index.js",
@@ -16,6 +16,7 @@
     "globals": "^15.9.0"
   },
   "dependencies": {
+    "@napi-rs/canvas": "^0.1.53",
     "discord.js": "^14.15.3",
     "dotenv": "^16.4.5",
     "lodash": "^4.17.21",

@@ -13,10 +13,12 @@ module.exports = {
 	printError(error) {
 		const date = new Intl.DateTimeFormat('ko-KR', this.dateFormat).format(Date.now());
 		console.error(`[${date}]`, error);
+		this.writeLog(error);
 	},
 	printLog(msg) {
 		const date = new Intl.DateTimeFormat('ko-KR', this.dateFormat).format(Date.now());
 		console.log(`[${date}] ${msg}`);
+		this.writeLog(msg);
 	},
 	// 로그파일 생성 후 경로를 사전에 환경변수 LOG로 지정해야 함
 	writeLog(msg) {

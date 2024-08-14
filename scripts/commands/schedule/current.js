@@ -5,10 +5,12 @@ const { stages, rules } = require(process.env.LANGUAGE);
 const { gamemode } = require(process.env.GAMEMODE_KR);
 const _ = require('lodash');
 
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+
 const fs = require('node:fs');
 const path = require('node:path');
 const { GAMEMODE } = require(process.env.API_DATA_SCHEMA);
+const { createStagesImg, createModeImg } = require(path.join(process.env.SCRIPTS, 'data/image-processor.js'));
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -32,7 +34,9 @@ module.exports = {
 		const schedulesFile = fs.readFileSync(schedulesFilePath);
 		const schedules = JSON.parse(schedulesFile);
 
-		const curr = schedules.find((schedule) => Date.now() < new Date(schedule.endTime));
+		const timeNow = Date.now();
+		// const curr = schedules[0];
+		const curr = schedules.find((schedule) => timeNow >= new Date(schedule.startTime) && timeNow < new Date(schedule.endTime));
 		const dateFormat = {
 			dateStyle: 'long',
 			timeStyle: 'short',
@@ -44,8 +48,27 @@ module.exports = {
 		const rule = _.get(rules, `${curr.rule.id}.name`);
 		const [ stage1, stage2 ] = curr.stages.map(x => _.get(stages, `${x.id}.name`));
 
-		const msg = `모드: ${mode}\n${startTime} ~ ${endTime}\n룰: ${rule}\n맵: ${stage1}, ${stage2}`;
-		// console.log(msg);
-		await interaction.reply(msg);
+		// const msg = `모드: ${mode}\n${startTime} ~ ${endTime}\n룰: ${rule}\n맵: ${stage1}, ${stage2}`;
+		const [ stageImgUrl1, stageImgUrl2 ] = curr.stages.map(x => x.image.url);
+		const stagesImg = await createStagesImg(stageImgUrl1, stageImgUrl2);
+		const modeImg = await createModeImg(curr.mode);
+
+		const scheduleInfoEmbed = new EmbedBuilder()
+			.setColor(0x0099FF)
+			.setTitle(mode)
+			// .setAuthor({ name: 'Some name', iconURL: 'https://i.imgur.com/AfFp7pu.png', url: 'https://discord.js.org' })
+			.setDescription(`${startTime} ~ ${endTime}`)
+			.setThumbnail(`attachment://${modeImg.name}`)
+			.addFields({ name: '룰', value: `${rule}` })
+			.addFields({ name: '스테이지', value: `${stage1} / ${stage2}` })
+			.setImage(`attachment://${stagesImg.name}`)
+			.setTimestamp();
+			// .setFooter({ text: 'Some footer text here', iconURL: 'https://i.imgur.com/AfFp7pu.png' });
+
+		await interaction.reply({
+			embeds: [ scheduleInfoEmbed ],
+			files: [ stagesImg, modeImg ],
+		});
+
 	},
 };
