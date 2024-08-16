@@ -1,4 +1,4 @@
-// API 호출로 가져온 스케줄 데이터로부터 원하는 정보 추출을 위해 사용
+// API 호출로 가져온 데이터로부터 원하는 정보만 추출하기 위한 맵핑
 module.exports = {
 	GAMEMODE: Object.freeze({
 		REGULAR: {
