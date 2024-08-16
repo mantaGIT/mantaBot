@@ -1,14 +1,15 @@
 const process = require('node:process');
-require('dotenv').config();
+// require('dotenv').config();
 
-const { clientId, token } = require(process.env.CONFIG);
-
-const { REST, Routes } = require('discord.js');
 const fs = require('node:fs');
 const path = require('node:path');
+// eslint-disable-next-line no-undef
+const mainPath = path.dirname(__dirname);
+
+const { REST, Routes } = require('discord.js');
 
 const commands = [];
-const foldersPath = path.join(process.env.SCRIPTS, 'commands');
+const foldersPath = path.join(mainPath, 'scripts/commands');
 const commandFolders = fs.readdirSync(foldersPath);
 
 for (const folder of commandFolders) {
@@ -28,7 +29,7 @@ for (const folder of commandFolders) {
 
 
 // Construct and prepare an instance of the REST module
-const rest = new REST().setToken(token);
+const rest = new REST().setToken(process.env.TOKEN);
 
 // and deploy your commands!
 (async () => {
@@ -37,8 +38,8 @@ const rest = new REST().setToken(token);
 
 		// The put method is used to fully refresh all commands in the guild with the current set
 		const data = await rest.put(
-			// Routes.applicationGuildCommands(clientId, guildId),
-			Routes.applicationCommands(clientId),
+			// Routes.applicationGuildCommands(process.env.CLIENT_ID, guildId),
+			Routes.applicationCommands(process.env.CLIENT_ID),
 			{ body: commands },
 		);
 		console.log(`Successfully reloaded ${data.length} application (/) commands.`);
