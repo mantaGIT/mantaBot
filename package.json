@@ -5,7 +5,6 @@
   "scripts": {
     "start": "node scripts/index.js",
     "deploy": "node scripts/deploy-commands.js",
-    "prepare": "node scripts/data/prepare-data-files.js",
     "test": "node scripts/test.js"
   },
   "author": "manta",
