@@ -3,7 +3,7 @@ const path = require('node:path');
 // eslint-disable-next-line no-undef
 const mainPath = path.dirname(path.dirname(__dirname));
 
-const { createScheduleData } = require(path.join(mainPath, 'scripts/data/create-schedule-data.js'));
+const { createScheduleData } = require(path.join(mainPath, 'scripts/data/schedule-data-generator.js'));
 const { GAMEMODE } = require(path.join(mainPath, 'scripts/data/schema/api-data-mapping.js'));
 
 
@@ -23,7 +23,7 @@ module.exports = {
 			});
 	},
 	createFetchApiTimer(url) {
-		console.log('Register fetch-api-data timer.');
+		console.log('Register api-fetch timer.');
 		// 홀수 시 3분마다 API 데이터 가져옴
 		schedule.scheduleJob('3 1-23/2 * * *', () => {
 			this.fetchApiData(url);
