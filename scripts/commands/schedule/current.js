@@ -1,19 +1,11 @@
-const process = require('node:process');
-// require('dotenv').config();
-const fs = require('node:fs');
 const path = require('node:path');
-
 // eslint-disable-next-line no-undef
 const mainPath = path.dirname(path.dirname(path.dirname(__dirname)));
-
-const { stages, rules } = require(path.join(mainPath, 'configs/ko-KR.json'));
-const { gamemode } = require(path.join(mainPath, 'configs/gamemodeKR.json'));
-const _ = require('lodash');
-
-const { SlashCommandBuilder, EmbedBuilder, userMention } = require('discord.js');
+const { SlashCommandBuilder } = require('discord.js');
 
 const { GAMEMODE } = require(path.join(mainPath, 'scripts/data/schema/api-data-mapping.js'));
-const { attachStages, attachMode } = require(path.join(mainPath, 'scripts/data/img-attachmentBuilder.js'));
+const schedHandler = require(path.join(mainPath, 'scripts/data/schedule-data-handler.js'));
+const embedSchedBuilder = require(path.join(mainPath, 'scripts/data/embed-schedule-builder.js'));
 
 
 module.exports = {
@@ -33,54 +25,14 @@ module.exports = {
 	async execute(interaction) {
 		await interaction.deferReply();
 
-		try {
-			const optionValue = GAMEMODE[interaction.options.getString('mode')];
-			const schedulesFilePath = path.join(mainPath, `resources/data/schedules/${optionValue.id}.json`);
+		const optionValue = GAMEMODE[interaction.options.getString('mode')];
+		const schedules = schedHandler.loadScheduleJson(optionValue.id);
+		if (schedules === undefined) throw new Error('cannot load schedule json file.');
 
-			const schedulesFile = fs.readFileSync(schedulesFilePath);
-			const schedules = JSON.parse(schedulesFile);
+		const scheduleNow = schedHandler.getScheduleNow(schedules);
+		if (scheduleNow === undefined) throw new Error('cannot find schedule now.');
 
-			const timeNow = Date.now();
-			// const curr = schedules[0];
-			const curr = schedules.find((schedule) => timeNow >= new Date(schedule.startTime) && timeNow < new Date(schedule.endTime));
-			const dateFormat = {
-				month: '2-digit',
-				day: '2-digit',
-				hour: '2-digit',
-				minute: '2-digit',
-				hour12: false,
-				timeZone: 'Asia/Seoul',
-			};
-			const mode = _.get(gamemode, `${curr.mode}.name`);
-			const startTime = new Intl.DateTimeFormat('en-US', dateFormat).format(new Date(curr.startTime));
-			const endTime = new Intl.DateTimeFormat('en-US', dateFormat).format(new Date(curr.endTime));
-			const rule = _.get(rules, `${curr.rule.id}.name`);
-			const [ stage1, stage2 ] = curr.stages.map(x => _.get(stages, `${x.id}.name`));
-
-			// const msg = `모드: ${mode}\n${startTime} ~ ${endTime}\n룰: ${rule}\n맵: ${stage1}, ${stage2}`;
-			const [ stageImgUrl1, stageImgUrl2 ] = curr.stages.map(x => path.join(mainPath, `resources/images/stages/${x.id}.png`));
-			const stagesImg = await attachStages(stageImgUrl1, stageImgUrl2);
-			const modeImg = await attachMode(curr.mode);
-
-			const scheduleInfoEmbed = new EmbedBuilder()
-				.setColor(0x568ea8)
-				.setTitle(mode)
-				.setDescription(`${startTime} ~ ${endTime}`)
-				.setThumbnail(`attachment://${modeImg.name}`)
-				.addFields({ name: '룰', value: `${rule}` })
-				.addFields({ name: '스테이지', value: `${stage1} / ${stage2}` })
-				.setImage(`attachment://${stagesImg.name}`)
-				.setTimestamp()
-				.setFooter({ text: 'Data access @splatoon3.ink' });
-
-			await interaction.editReply({
-				embeds: [ scheduleInfoEmbed ],
-				files: [ stagesImg, modeImg ],
-			});
-		}
-		catch (error) {
-			console.error(error);
-			await interaction.editReply({ content: `${userMention(process.env.DEV_ID)} 명령어 처리에 에러가 발생하였습니다.` });
-		}
+		const reply = await embedSchedBuilder.embedScheduleBuilder(scheduleNow);
+		await interaction.editReply(reply);
 	},
 };
