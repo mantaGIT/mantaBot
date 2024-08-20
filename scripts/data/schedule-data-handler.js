@@ -31,8 +31,8 @@ module.exports = {
 		const dataFilePath = path.join(mainPath, `resources/data/schedules/${gamemode.id}.json`);
 		fs.writeFileSync(dataFilePath, JSON.stringify(data, null, 2));
 	},
-	loadScheduleJson(modeId) {
-		const scheduleFilePath = path.join(mainPath, `resources/data/schedules/${modeId}.json`);
+	loadScheduleJson(mode) {
+		const scheduleFilePath = path.join(mainPath, `resources/data/schedules/${mode.id}.json`);
 
 		try {
 			const schedulesFile = fs.readFileSync(scheduleFilePath);
@@ -48,5 +48,8 @@ module.exports = {
 		const timeNow = Date.now();
 		const scheduleNow = schedules.find((schedule) => timeNow >= new Date(schedule.startTime) && timeNow < new Date(schedule.endTime));
 		return scheduleNow;
+	},
+	getScheduleByNode(schedules, node) {
+		return schedules.find((schedule) => schedule.node === node);
 	},
 };

@@ -5,7 +5,7 @@ const { SlashCommandBuilder } = require('discord.js');
 
 const { GAMEMODE } = require(path.join(mainPath, 'scripts/data/schema/api-data-mapping.js'));
 const schedHandler = require(path.join(mainPath, 'scripts/data/schedule-data-handler.js'));
-const embedSchedBuilder = require(path.join(mainPath, 'scripts/data/embed-schedule-builder.js'));
+const embedSchedBuilder = require(path.join(mainPath, 'scripts/reply-builders/embed-schedule-builder.js'));
 
 
 module.exports = {
@@ -26,7 +26,7 @@ module.exports = {
 		await interaction.deferReply();
 
 		const optionValue = GAMEMODE[interaction.options.getString('mode')];
-		const schedules = schedHandler.loadScheduleJson(optionValue.id);
+		const schedules = schedHandler.loadScheduleJson(optionValue);
 		if (schedules === undefined) throw new Error('cannot load schedule json file.');
 
 		const scheduleNow = schedHandler.getScheduleNow(schedules);

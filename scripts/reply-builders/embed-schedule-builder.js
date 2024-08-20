@@ -9,20 +9,13 @@ const { stages: stagesKR, rules: rulesKR } = require(path.join(mainPath, 'config
 const { gamemode: gamemodeKR } = require(path.join(mainPath, 'configs/gamemodeKR.json'));
 const _ = require('lodash');
 
+const { getFormatTimes } = require(path.join(mainPath, 'scripts/reply-builders/time-format-builder.js'));
+
 
 module.exports = {
 	async embedScheduleBuilder(schedule) {
-		const dateFormat = {
-			month: '2-digit',
-			day: '2-digit',
-			hour: '2-digit',
-			minute: '2-digit',
-			hour12: false,
-			timeZone: 'Asia/Seoul',
-		};
 		const mode = _.get(gamemodeKR, `${schedule.mode}.name`);
-		const startTime = new Intl.DateTimeFormat('en-US', dateFormat).format(new Date(schedule.startTime));
-		const endTime = new Intl.DateTimeFormat('en-US', dateFormat).format(new Date(schedule.endTime));
+		const [ startTime, endTime ] = getFormatTimes(schedule);
 		const rule = _.get(rulesKR, `${schedule.rule.id}.name`);
 		const [ stage1, stage2 ] = schedule.stages.map(x => _.get(stagesKR, `${x.id}.name`));
 
@@ -43,10 +36,10 @@ module.exports = {
 
 		return { embeds: [ scheduleInfoEmbed ], files: [ stagesImage, modeImage ] };
 	},
+
 	async attachStagesImage(url1, url2) {
 		const canvas = Canvas.createCanvas(800, 200);
 		const context = canvas.getContext('2d');
-
 		try {
 			const stage1 = await Canvas.loadImage(url1);
 			const stage2 = await Canvas.loadImage(url2);
@@ -59,10 +52,10 @@ module.exports = {
 		}
 		return new AttachmentBuilder(await canvas.encode('png'), { name: 'stages-image.png' });
 	},
+
 	async attachModeImage(mode) {
 		const canvas = Canvas.createCanvas(40, 40);
 		const context = canvas.getContext('2d');
-
 		try {
 			const modeImg = await Canvas.loadImage(path.join(mainPath, `resources/images/mode/${mode}.png`));
 			context.drawImage(modeImg, 0, 0, canvas.width, canvas.height);
