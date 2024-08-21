@@ -24,24 +24,9 @@ module.exports = {
 
 		const embedSched = await embedSchedBuilder.embedScheduleBuilder(scheduleNow);
 
-		// 스케줄의 시작 시간과 끝나는 시간을 모두 표시, 08/20, 21:00 ~ 08/20, 23:00과 같은 형식
-		// const dateFormat = {
-		// 	month: '2-digit',
-		// 	day: '2-digit',
-		// 	hour: '2-digit',
-		// 	minute: '2-digit',
-		// 	hour12: false,
-		// 	timeZone: 'Asia/Seoul',
-		// };
-		// const scheduleTimeList = schedules.map((schedule) => {
-		// 	const startTime = new Intl.DateTimeFormat('en-US', dateFormat).format(new Date(schedule.startTime));
-		// 	const endTime = new Intl.DateTimeFormat('en-US', dateFormat).format(new Date(schedule.endTime));
-		// 	return { node: String(schedule.node), time: `${startTime} ~ ${endTime}` };
-		// }).filter((schedTime) => schedTime.node >= scheduleNow.node);
-
-		// 스케줄의 시작 시간만 표시, 08/20, 21:00 ~ 08/20, 23:00과 같은 형식
+		// 스케줄의 시작 시간만 표시, 2024년 08월 20일 21:00와 같은 형식
 		const dateFormat = {
-			dateStyle: 'medium',
+			dateStyle: 'long',
 			timeStyle: 'short',
 			hour12: false,
 			timeZone: 'Asia/Seoul',
@@ -53,7 +38,6 @@ module.exports = {
 
 		const scheduleTimeMenu = new StringSelectMenuBuilder()
 			.setCustomId('scheduleTime')
-			// .setPlaceholder('스케줄 시간을 선택해주세요.')
 			.setPlaceholder('스케줄 시작 시간을 선택해주세요.')
 			.addOptions(scheduleTimeList.map((schedTime) => {
 				return new StringSelectMenuOptionBuilder()
@@ -68,13 +52,11 @@ module.exports = {
 			files: embedSched.files,
 			components: [ actionRow ],
 		});
-		// console.log(new Date(Date.now()));
 
 		// 응답 가능 시간 : 10분 (time: ms) => 10 * 60 * 1000
 		const collector = response.createMessageComponentCollector({ componentType: ComponentType.StringSelect, time: 600_000 });
 
 		collector.on('collect', async i => {
-			// console.log(i.customId);
 			if (i.member.id !== interaction.user.id) {
 				return i.reply({ content: '스케줄 시간 선택은 명령어 사용자만 가능합니다.', ephemeral: true });
 			}
@@ -86,7 +68,6 @@ module.exports = {
 			}
 		});
 		collector.on('end', () => {
-			// console.log(new Date(Date.now()));
 			interaction.editReply({ content: '스케줄 선택 가능 시간이 만료되었습니다.' });
 		});
 	},
