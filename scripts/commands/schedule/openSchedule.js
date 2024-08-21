@@ -63,7 +63,6 @@ module.exports = {
 				const selectedSched = schedHandler.getScheduleByNode(schedules, parseInt(i.values[0]));
 				const editEmbed = await schedEmbedBuilder.embedScheduleBuilder(selectedSched);
 				i.deferUpdate();
-				console.log(i);
 				await interaction.editReply(editEmbed);
 			}
 		});
