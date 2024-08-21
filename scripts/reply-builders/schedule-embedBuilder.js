@@ -2,14 +2,14 @@ const path = require('node:path');
 // eslint-disable-next-line no-undef
 const mainPath = path.dirname(path.dirname(__dirname));
 
-const { AttachmentBuilder, EmbedBuilder } = require('discord.js');
+const { EmbedBuilder, AttachmentBuilder } = require('discord.js');
 const Canvas = require('@napi-rs/canvas');
 
-const { stages: stagesKR, rules: rulesKR } = require(path.join(mainPath, 'configs/ko-KR.json'));
-const { gamemode: gamemodeKR } = require(path.join(mainPath, 'configs/gamemodeKR.json'));
+const { stages: stagesKR, rules: rulesKR } = require('../../configs/ko-KR.json');
+const { gamemode: gamemodeKR } = require('../../configs/gamemodeKR.json');
 const _ = require('lodash');
 
-const { getFormatTimes } = require(path.join(mainPath, 'scripts/reply-builders/time-format-builder.js'));
+const { getFormatTimes } = require('./timeFormat-setter.js');
 
 
 module.exports = {

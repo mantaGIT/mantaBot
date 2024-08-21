@@ -5,7 +5,8 @@ const path = require('node:path');
 
 // eslint-disable-next-line no-undef
 const mainPath = path.dirname(__dirname);
-const timer = require(path.join(mainPath, 'scripts/data/api-fetch-timer.js'));
+const timer = require('../scripts/data/api-fetch-timer.js');
+
 
 const { Client, Collection, GatewayIntentBits } = require('discord.js');
 
