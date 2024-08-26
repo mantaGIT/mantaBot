@@ -1,8 +1,10 @@
-const { SlashCommandBuilder, ActionRowBuilder } = require("discord.js");
 const {
+    SlashCommandBuilder,
+    ActionRowBuilder,
     StringSelectMenuBuilder,
     StringSelectMenuOptionBuilder,
-    ComponentType,
+    ButtonBuilder,
+    ButtonStyle,
 } = require("discord.js");
 
 const { GAMEMODE } = require("../../data/schema/api-data-mapping.js");
@@ -22,12 +24,12 @@ module.exports = {
         if (schedules === undefined)
             throw new Error("cannot load schedule json file.");
 
-        const scheduleNow = schedHandler.getScheduleNow(schedules);
-        if (scheduleNow === undefined)
+        const schedNow = schedHandler.getScheduleNow(schedules);
+        if (schedNow === undefined)
             throw new Error("cannot find schedule now.");
 
         const schedEmbed =
-            await schedEmbedBuilder.embedScheduleBuilder(scheduleNow);
+            await schedEmbedBuilder.embedScheduleBuilder(schedNow);
 
         // 스케줄의 시작 시간만 표시, 2024년 08월 20일 21:00와 같은 형식
         const dateFormat = {
@@ -44,7 +46,7 @@ module.exports = {
                 ).format(new Date(schedule.startTime));
                 return { node: String(schedule.node), time: `${startTime}` };
             })
-            .filter((schedTime) => schedTime.node >= scheduleNow.node);
+            .filter((schedTime) => schedTime.node >= schedNow.node);
 
         const schedTimeMenu = new StringSelectMenuBuilder()
             .setCustomId("scheduleTime")
@@ -57,19 +59,34 @@ module.exports = {
                 }),
             );
 
-        const actionRow = new ActionRowBuilder().addComponents(schedTimeMenu);
+        const menuRow = new ActionRowBuilder().addComponents(schedTimeMenu);
+
+        const prev = new ButtonBuilder()
+            .setCustomId("prev")
+            .setLabel("이전 스케줄")
+            .setStyle(ButtonStyle.Primary)
+            .setDisabled(true);
+
+        const next = new ButtonBuilder()
+            .setCustomId("next")
+            .setLabel("다음 스케줄")
+            .setStyle(ButtonStyle.Primary);
+
+        const buttonRow = new ActionRowBuilder().addComponents(prev, next);
 
         const response = await interaction.editReply({
             embeds: schedEmbed.embeds,
             files: schedEmbed.files,
-            components: [actionRow],
+            components: [menuRow, buttonRow],
         });
 
         // 응답 가능 시간 : 10분 (time: ms) => 10 * 60 * 1000
         const collector = response.createMessageComponentCollector({
-            componentType: ComponentType.StringSelect,
             time: 600_000,
         });
+
+        let currNode = schedNow.node;
+        const schedNodeList = schedules.map((schedule) => schedule.node);
 
         collector.on("collect", async (i) => {
             if (i.member.id !== interaction.user.id) {
@@ -79,15 +96,31 @@ module.exports = {
                 });
             }
             if (i.customId === "scheduleTime") {
-                const selectedSched = schedHandler.getScheduleByNode(
-                    schedules,
-                    parseInt(i.values[0]),
-                );
-                const editEmbed =
-                    await schedEmbedBuilder.embedScheduleBuilder(selectedSched);
-                i.deferUpdate();
-                await interaction.editReply(editEmbed);
+                currNode = parseInt(i.values[0]);
+            } else if (i.customId === "prev") {
+                currNode = currNode - 1;
+            } else if (i.customId === "next") {
+                currNode = currNode + 1;
             }
+            const [prevNode, nextNode] = [currNode - 1, currNode + 1];
+            buttonRow.components[0].setDisabled(
+                schedNodeList.find((node) => node === prevNode) === undefined,
+            );
+            buttonRow.components[1].setDisabled(
+                schedNodeList.find((node) => node === nextNode) === undefined,
+            );
+            const selectedSched = schedHandler.getScheduleByNode(
+                schedules,
+                currNode,
+            );
+            const editEmbed =
+                await schedEmbedBuilder.embedScheduleBuilder(selectedSched);
+            i.deferUpdate();
+            await interaction.editReply({
+                embeds: editEmbed.embeds,
+                files: editEmbed.files,
+                components: [menuRow, buttonRow],
+            });
         });
         collector.on("end", () => {
             interaction.editReply({
