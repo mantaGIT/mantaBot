@@ -16,7 +16,7 @@ module.exports = {
         const botCommandsFile = fs.readFileSync(botCommandsPath);
         const botCommandList = JSON.parse(botCommandsFile);
         const botCmdDescriptions = botCommandList.map(
-            (info) => `${inlineCode(info.cmd)} : ${info.description}`,
+            (info) => `- ${inlineCode(info.cmd)} : ${info.description}`,
         );
 
         const botInfoEmbed = new EmbedBuilder()
