@@ -1,16 +1,16 @@
 {
-    "gamemode": {
-        "regular": {
-            "name": "레귤러 매치"
-        },
-        "challenge": {
-            "name": "카오폴리스 매치 (챌린지)"
-        },
-        "open": {
-            "name": "카오폴리스 매치 (오픈)"
-        },
-        "x": {
-            "name": "X 매치"
-        }
+  "gamemode": {
+    "regular": {
+      "name": "레귤러 매치"
+    },
+    "challenge": {
+      "name": "카오폴리스 매치 (챌린지)"
+    },
+    "open": {
+      "name": "카오폴리스 매치 (오픈)"
+    },
+    "x": {
+      "name": "X 매치"
     }
+  }
 }
