@@ -1,6 +1,6 @@
 {
   "name": "mantabot",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "main": "scripts/index.js",
   "scripts": {
     "start": "node scripts/index.js",
@@ -14,7 +14,9 @@
     "@eslint/js": "^9.8.0",
     "dotenv": "^16.4.5",
     "eslint": "^9.8.0",
-    "globals": "^15.9.0"
+    "eslint-config-prettier": "^9.1.0",
+    "globals": "^15.9.0",
+    "prettier": "^3.3.3"
   },
   "dependencies": {
     "@napi-rs/canvas": "^0.1.53",
