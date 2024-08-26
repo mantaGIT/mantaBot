@@ -5,22 +5,20 @@ const {
     ComponentType,
 } = require("discord.js");
 
-const {
-    GAMEMODE,
-} = require("../../../scripts/data/schema/api-data-mapping.js");
-const schedHandler = require("../../../scripts/data/schedule-data-handler.js");
+const { GAMEMODE } = require("../../data/schema/api-data-mapping.js");
+const schedHandler = require("../../data/schedule-data-handler.js");
 const schedEmbedBuilder = require("../../reply-builders/schedule-embedBuilder.js");
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName("오픈")
+        .setName("챌린지")
         .setDescription(
-            "선택한 시간대의 카오폴리스 매치(오픈) 스케줄을 알려줍니다.",
+            "선택한 시간대의 카오폴리스 매치(챌린지) 스케줄을 알려줍니다.",
         ),
     async execute(interaction) {
         await interaction.deferReply();
 
-        const schedules = schedHandler.loadScheduleJson(GAMEMODE.OPEN);
+        const schedules = schedHandler.loadScheduleJson(GAMEMODE.CHALLENGE);
         if (schedules === undefined)
             throw new Error("cannot load schedule json file.");
 

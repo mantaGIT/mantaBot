@@ -13,14 +13,12 @@ const schedEmbedBuilder = require("../../reply-builders/schedule-embedBuilder.js
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName("오픈")
-        .setDescription(
-            "선택한 시간대의 카오폴리스 매치(오픈) 스케줄을 알려줍니다.",
-        ),
+        .setName("레귤러")
+        .setDescription("선택한 시간대의 레귤러 매치 스케줄을 알려줍니다."),
     async execute(interaction) {
         await interaction.deferReply();
 
-        const schedules = schedHandler.loadScheduleJson(GAMEMODE.OPEN);
+        const schedules = schedHandler.loadScheduleJson(GAMEMODE.REGULAR);
         if (schedules === undefined)
             throw new Error("cannot load schedule json file.");
 
