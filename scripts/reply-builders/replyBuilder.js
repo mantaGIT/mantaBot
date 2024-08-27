@@ -79,8 +79,10 @@ module.exports = {
             components: [menuRow, buttonRow],
         });
 
+        const filter = (i) => i.user.id === interaction.user.id;
         // 응답 가능 시간 : 10분 (time: ms) => 10 * 60 * 1000
         const collector = response.createMessageComponentCollector({
+            filter,
             time: 600_000,
         });
 
@@ -94,12 +96,6 @@ module.exports = {
             buttonRow.components.forEach((btn) => btn.setDisabled(true));
             i.update({ components: [menuRow, buttonRow] });
 
-            if (i.member.id !== interaction.user.id) {
-                return i.reply({
-                    content: "스케줄 시간 선택은 명령어 사용자만 가능합니다.",
-                    ephemeral: true,
-                });
-            }
             if (i.customId === "scheduleTime") {
                 currNode = parseInt(i.values[0]);
             } else if (i.customId === "prev") {
