@@ -81,7 +81,7 @@ module.exports = {
         const context = canvas.getContext("2d");
         try {
             const modeImg = await Canvas.loadImage(
-                path.join(mainPath, `resources/images/mode/${mode}.png`),
+                path.join(mainPath, `resources/images/mode/${mode}.svg`),
             );
             context.drawImage(modeImg, 0, 0, canvas.width, canvas.height);
         } catch (error) {
