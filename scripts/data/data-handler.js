@@ -1,51 +1,31 @@
-const _ = require("lodash");
+// const _ = require("lodash");
 const fs = require("node:fs");
 const path = require("node:path");
+const {
+    parseMatchData,
+    parseSalmonData,
+} = require("../../scripts/data/api-data-parser.js");
+
 // eslint-disable-next-line no-undef
 const mainPath = path.dirname(path.dirname(__dirname));
 
-function Schedule(nodeNum, mode, st, et, rule, stages) {
-    this.node = nodeNum;
-    this.mode = mode;
-    this.startTime = st;
-    this.endTime = et;
-    this.rule = rule;
-    this.stages = stages;
-}
-
 module.exports = {
     createScheduleJsonFile(apiData, gamemode) {
-        const nodes = _.get(apiData, gamemode.tag).nodes;
-        const startTimes = _.map(nodes, "startTime");
-        const endTimes = _.map(nodes, "endTime");
-        let setting = _.map(nodes, gamemode.setting);
-        if (gamemode.mode !== undefined) {
-            setting = _.filter(_.flattenDeep(setting), [
-                "bankaraMode",
-                gamemode.mode,
-            ]);
+        let data = undefined;
+        console.log(gamemode.mode);
+        if (gamemode.mode == "salmon") {
+            data = parseSalmonData(apiData, gamemode);
+        } else {
+            data = parseMatchData(apiData, gamemode);
         }
-        const rules = _.map(setting, "vsRule");
-        const stagesArr = _.map(setting, "vsStages");
-
-        const data = Array.from({ length: nodes.length }).map(
-            (x, i) =>
-                (x = new Schedule(
-                    i,
-                    gamemode.id,
-                    startTimes[i],
-                    endTimes[i],
-                    rules[i],
-                    stagesArr[i],
-                )),
-        );
 
         const dataFilePath = path.join(
             mainPath,
-            `resources/data/schedules/${gamemode.id}.json`,
+            `resources/data/schedules/${gamemode.mode}.json`,
         );
         fs.writeFileSync(dataFilePath, JSON.stringify(data, null, 2));
     },
+    // 아래부터 리팩토링 다시 해야함
     loadScheduleJson(mode) {
         const scheduleFilePath = path.join(
             mainPath,

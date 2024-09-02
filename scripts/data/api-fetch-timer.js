@@ -1,26 +1,21 @@
 const schedule = require("node-schedule");
 
-const { GAMEMODE } = require("../../scripts/data/schema/api-data-mapping.js");
-const schedHandler = require("../../scripts/data/schedule-data-handler.js");
+const { GAMEMODE } = require("../../configs/gamemode.json");
+const schedHandler = require("../../scripts/data/data-handler.js");
 
 module.exports = {
     fetchApiData(url) {
         fetch(url)
             .then((response) => response.json())
             .then((apiData) => {
+                schedHandler.createScheduleJsonFile(apiData, GAMEMODE.REGULAR);
                 schedHandler.createScheduleJsonFile(
-                    apiData.data,
-                    GAMEMODE.REGULAR,
-                );
-                schedHandler.createScheduleJsonFile(
-                    apiData.data,
-                    GAMEMODE.OPEN,
-                );
-                schedHandler.createScheduleJsonFile(
-                    apiData.data,
+                    apiData,
                     GAMEMODE.CHALLENGE,
                 );
-                schedHandler.createScheduleJsonFile(apiData.data, GAMEMODE.X);
+                schedHandler.createScheduleJsonFile(apiData, GAMEMODE.OPEN);
+                schedHandler.createScheduleJsonFile(apiData, GAMEMODE.X);
+                schedHandler.createScheduleJsonFile(apiData, GAMEMODE.SALMON);
                 console.log(
                     `Update schedule data files by gamemode from ${url}.`,
                 );
