@@ -1,7 +1,7 @@
 const { SlashCommandBuilder } = require("discord.js");
 
-const { GAMEMODE } = require("../../data/schema/api-data-mapping.js");
-const replyBuilder = require("../../reply-builders/replyBuilder.js");
+const { GAMEMODE } = require("../../../configs/gamemode.json");
+const replyBuilder = require("../../reply/replyBuilder.js");
 
 module.exports = {
     data: new SlashCommandBuilder()

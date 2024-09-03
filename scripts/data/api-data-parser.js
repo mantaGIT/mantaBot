@@ -3,6 +3,9 @@ const _ = require("lodash");
 const { MatchSchedule, SalmonSchedule, ApiDataMap } = require("./_schema.js");
 
 module.exports = {
+    /**
+     * API 데이터로부터 PVP 매치 스케줄을 파싱한다.
+     */
     parseMatchData(apiData, mode) {
         const apiDataMap = ApiDataMap[mode];
         const nodes = _.get(apiData, `data.${apiDataMap.group}.nodes`);
@@ -27,6 +30,9 @@ module.exports = {
             .sort((a, b) => a.id - b.id);
         return data;
     },
+    /**
+     * API 데이터로부터 연어런 스케줄을 파싱한다.
+     */
     parseSalmonData(apiData, mode) {
         const apiDataMap = ApiDataMap[mode];
 

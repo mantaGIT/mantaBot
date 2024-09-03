@@ -1,6 +1,6 @@
 module.exports = {
     /**
-     * PVP 매치 스케줄 데이터 구조
+     * PVP 매치 스케줄 객체
      * @param {number} id 스케줄 데이터 ID
      * @param {string} mode 게임 모드 (레귤러, 챌린지, 오픈, X매치)
      * @param {string} startTime 스케줄 시작 시간
@@ -20,7 +20,7 @@ module.exports = {
         };
     },
     /**
-     * 연어런 스케줄 데이터 구조
+     * 연어런 스케줄 객체
      * @param {number} id 스케줄 데이터 ID
      * @param {string} mode 게임 모드
      * @param {string} submode 서브 모드 (일반 / 빅런)

@@ -4,6 +4,9 @@ const { GAMEMODE } = require("../../configs/gamemode.json");
 const schedHandler = require("./schedule-data-handler.js");
 
 module.exports = {
+    /**
+     * API 호출 및 API 데이터를 처리한다.
+     */
     fetchApiData(url) {
         fetch(url)
             .then((response) => response.json())
@@ -23,6 +26,9 @@ module.exports = {
                 console.error(error);
             });
     },
+    /**
+     * API 호출 모듈을 원하는 시간마다 동작하도록 스케줄링한다.
+     */
     createFetchApiTimer(url) {
         console.log("Register api-fetch timer.");
         // 홀수 시 1분마다 API 데이터 가져온다
