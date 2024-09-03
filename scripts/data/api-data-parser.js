@@ -3,41 +3,32 @@ const _ = require("lodash");
 const { MatchSchedule, SalmonSchedule, ApiDataMap } = require("./_schema.js");
 
 module.exports = {
-    // ex. gamemode = GAMEMODE.REGULAR
-    parseMatchData(apiData, gamemode) {
-        const apiDataMap = ApiDataMap[gamemode.mode];
-        console.log(apiDataMap);
+    parseMatchData(apiData, mode) {
+        const apiDataMap = ApiDataMap[mode];
         const nodes = _.get(apiData, `data.${apiDataMap.group}.nodes`);
 
         const data = nodes
             .map((node) => {
-                const startTime = node.startTime;
-                const endTime = node.endTime;
                 const setting =
                     apiDataMap.settingMode === undefined
                         ? _.get(node, apiDataMap.setting)
                         : _.find(_.get(node, apiDataMap.setting), {
                               bankaraMode: `${apiDataMap.settingMode}`,
                           });
-                const rule = _.get(setting, "vsRule.id");
-                const stages = _.map(_.get(setting, "vsStages"), "id");
                 return MatchSchedule(
-                    new Date(startTime).getTime(),
-                    gamemode.mode,
-                    startTime,
-                    endTime,
-                    rule,
-                    stages,
+                    new Date(node.startTime).getTime(),
+                    mode,
+                    node.startTime,
+                    node.endTime,
+                    _.get(setting, "vsRule.id"),
+                    _.map(_.get(setting, "vsStages"), "id"),
                 );
             })
-            .sort((a, b) => a.no - b.no);
+            .sort((a, b) => a.id - b.id);
         return data;
     },
-    // ex. gamemode = GAMEMODE.SALMON
-    parseSalmonData(apiData, gamemode) {
-        const apiDataMap = ApiDataMap[gamemode.mode];
-        // debug
-        console.log(apiDataMap);
+    parseSalmonData(apiData, mode) {
+        const apiDataMap = ApiDataMap[mode];
 
         let data = [];
         // subgroup : regularSchedules, bigRunSchedules
@@ -49,29 +40,21 @@ module.exports = {
             if (nodes.length === 0) break;
 
             const salmonSchedules = nodes.map((node) => {
-                const startTime = node.startTime;
-                const endTime = node.endTime;
                 const setting = _.get(node, apiDataMap.setting);
-                const stage = _.get(setting, "coopStage.id");
-                const boss = _.get(setting, "boss.id");
-                const weapons = _.map(
-                    _.get(setting, "weapons"),
-                    "__splatoon3ink_id",
-                );
                 return SalmonSchedule(
-                    new Date(startTime).getTime(),
-                    gamemode.mode,
+                    new Date(node.startTime).getTime(),
+                    mode,
                     subgroup,
-                    startTime,
-                    endTime,
-                    stage,
-                    boss,
-                    weapons,
+                    node.startTime,
+                    node.endTime,
+                    _.get(setting, "coopStage.id"),
+                    _.get(setting, "boss.id"),
+                    _.map(_.get(setting, "weapons"), "__splatoon3ink_id"),
                 );
             });
             data = [...data, ...salmonSchedules];
         }
-        data = data.sort((a, b) => a.no - b.no);
+        data = data.sort((a, b) => a.id - b.id);
         return data;
     },
 };

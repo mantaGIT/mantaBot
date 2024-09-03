@@ -1,22 +1,18 @@
 // const _ = require("lodash");
 const fs = require("node:fs");
 const path = require("node:path");
-const {
-    parseMatchData,
-    parseSalmonData,
-} = require("../../scripts/data/api-data-parser.js");
+const { parseMatchData, parseSalmonData } = require("./api-data-parser.js");
 
 // eslint-disable-next-line no-undef
 const mainPath = path.dirname(path.dirname(__dirname));
 
 module.exports = {
-    createScheduleJsonFile(apiData, gamemode) {
+    createSchedulesFile(apiData, gamemode) {
         let data = undefined;
-        console.log(gamemode.mode);
-        if (gamemode.mode == "salmon") {
-            data = parseSalmonData(apiData, gamemode);
+        if (gamemode.mode === "salmon") {
+            data = parseSalmonData(apiData, gamemode.mode);
         } else {
-            data = parseMatchData(apiData, gamemode);
+            data = parseMatchData(apiData, gamemode.mode);
         }
 
         const dataFilePath = path.join(
@@ -25,11 +21,10 @@ module.exports = {
         );
         fs.writeFileSync(dataFilePath, JSON.stringify(data, null, 2));
     },
-    // 아래부터 리팩토링 다시 해야함
-    loadScheduleJson(mode) {
+    loadSchedulesFile(gamemode) {
         const scheduleFilePath = path.join(
             mainPath,
-            `resources/data/schedules/${mode.id}.json`,
+            `resources/data/schedules/${gamemode.mode}.json`,
         );
 
         try {
@@ -50,7 +45,7 @@ module.exports = {
         );
         return scheduleNow;
     },
-    getScheduleByNode(schedules, node) {
-        return schedules.find((schedule) => schedule.node === node);
+    getScheduleById(schedules, id) {
+        return schedules.find((schedule) => schedule.id === id);
     },
 };
