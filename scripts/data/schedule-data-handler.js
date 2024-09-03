@@ -1,55 +1,36 @@
-const _ = require("lodash");
+// const _ = require("lodash");
 const fs = require("node:fs");
 const path = require("node:path");
+
+const { GAMEMODE } = require("../../configs/gamemode.json");
+const { parseMatchData, parseSalmonData } = require("./api-data-parser.js");
+
 // eslint-disable-next-line no-undef
 const mainPath = path.dirname(path.dirname(__dirname));
 
-function Schedule(nodeNum, mode, st, et, rule, stages) {
-    this.node = nodeNum;
-    this.mode = mode;
-    this.startTime = st;
-    this.endTime = et;
-    this.rule = rule;
-    this.stages = stages;
-}
-
 module.exports = {
-    createScheduleJsonFile(apiData, gamemode) {
-        const nodes = _.get(apiData, gamemode.tag).nodes;
-        const startTimes = _.map(nodes, "startTime");
-        const endTimes = _.map(nodes, "endTime");
-        let setting = _.map(nodes, gamemode.setting);
-        if (gamemode.mode !== undefined) {
-            setting = _.filter(_.flattenDeep(setting), [
-                "bankaraMode",
-                gamemode.mode,
-            ]);
-        }
-        const rules = _.map(setting, "vsRule");
-        const stagesArr = _.map(setting, "vsStages");
-
-        const data = Array.from({ length: nodes.length }).map(
-            (x, i) =>
-                (x = new Schedule(
-                    i,
-                    gamemode.id,
-                    startTimes[i],
-                    endTimes[i],
-                    rules[i],
-                    stagesArr[i],
-                )),
-        );
+    /**
+     * 스케줄 객체 파일을 생성한다.
+     */
+    createSchedulesFile(apiData, gamemode) {
+        const data =
+            gamemode.mode === GAMEMODE.SALMON.mode
+                ? parseSalmonData(apiData, gamemode.mode)
+                : parseMatchData(apiData, gamemode.mode);
 
         const dataFilePath = path.join(
             mainPath,
-            `resources/data/schedules/${gamemode.id}.json`,
+            `resources/data/schedules/${gamemode.mode}.json`,
         );
         fs.writeFileSync(dataFilePath, JSON.stringify(data, null, 2));
     },
-    loadScheduleJson(mode) {
+    /**
+     * 파일을 읽어 스케줄 객체를 가져온다.
+     */
+    loadSchedules(gamemode) {
         const scheduleFilePath = path.join(
             mainPath,
-            `resources/data/schedules/${mode.id}.json`,
+            `resources/data/schedules/${gamemode.mode}.json`,
         );
 
         try {
@@ -61,6 +42,9 @@ module.exports = {
             return undefined;
         }
     },
+    /**
+     * 현재 스케줄 객체를 반환한다.
+     */
     getScheduleNow(schedules) {
         const timeNow = Date.now();
         const scheduleNow = schedules.find(
@@ -70,7 +54,10 @@ module.exports = {
         );
         return scheduleNow;
     },
-    getScheduleByNode(schedules, node) {
-        return schedules.find((schedule) => schedule.node === node);
+    /**
+     * 해당 ID를 갖는 스케줄 객체를 반환한다.
+     */
+    getScheduleById(schedules, id) {
+        return schedules.find((schedule) => schedule.id === id);
     },
 };
