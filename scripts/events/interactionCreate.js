@@ -18,7 +18,7 @@ module.exports = {
 
         try {
             console.log(
-                `Call /${interaction.commandName} by @${interaction.user.username}.`,
+                `Call /${interaction.commandName} in ${interaction.member.guild.name} by @${interaction.user.username}.`,
             );
             await command.execute(interaction);
         } catch (error) {
