@@ -49,7 +49,8 @@ for (const file of eventFiles) {
 }
 
 // execute a schedule-data-fetch timer
-timer.fetchApiData(process.env.URL);
+timer.fetchScheduleData(process.env.URL);
+timer.fetchLanguageData("https://splatoon3.ink/data/locale/ko-KR.json");
 timer.createFetchApiTimer(process.env.URL);
 
 client.login(process.env.TOKEN);
