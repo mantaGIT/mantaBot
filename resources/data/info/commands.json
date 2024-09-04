@@ -16,6 +16,10 @@
     "description": "스플래툰3 X매치 스케줄 확인"
   },
   {
+    "cmd": "/연어",
+    "description": "스플래툰3 연어런 스케줄 확인"
+  },
+  {
     "cmd": "/만타봇",
     "description": "만타봇 정보 확인"
   }
