@@ -7,10 +7,13 @@ const {
 } = require("discord.js");
 
 const schedHandler = require("../data/schedule-data-handler.js");
+const { GAMEMODE } = require("../../configs/gamemode.json");
 const { embedMatchBuilder } = require("./embeds/match-embedBuilder.js");
+const { embedSalmonBuilder } = require("./embeds/salmon-embedBuilder.js");
 const { embedInfoBuilder } = require("./embeds/info-embedBuilder.js");
 
 module.exports = {
+    // ex. gamemode = GAMEMODE.REGULAR
     async scheduleReply(interaction, gamemode) {
         await interaction.deferReply();
 
@@ -22,7 +25,12 @@ module.exports = {
         if (schedNow === undefined)
             throw new Error("cannot find schedule now.");
 
-        const schedEmbed = await embedMatchBuilder(schedNow);
+        const embedBuilder =
+            gamemode.mode === GAMEMODE.SALMON.mode
+                ? embedSalmonBuilder
+                : embedMatchBuilder;
+
+        const schedEmbed = await embedBuilder(schedNow);
 
         // 스케줄의 시작 시간만 표시, 2024년 08월 20일 21:00와 같은 형식
         const dateFormat = {
@@ -73,8 +81,6 @@ module.exports = {
             components: [menuRow, buttonRow],
         });
 
-        // 스케줄 시간 간격 : 2 h = 2 * 60 * 60 * 1000 ms
-        const TIME_INTERVAL = 7200000;
         const filter = (i) => i.user.id === interaction.user.id;
         // 응답 가능 시간 : 10분 (time: ms) => 10 * 60 * 1000
         const collector = response.createMessageComponentCollector({
@@ -82,40 +88,54 @@ module.exports = {
             time: 600_000,
         });
 
-        let currSchedId = schedNow.id;
         const schedIdList = schedTimeList.map((schedTime) =>
             parseInt(schedTime.id),
         );
+        const schedIdMap = Object.fromEntries(
+            schedIdList.map((id, i) => [
+                id,
+                { prev: schedIdList[i - 1], next: schedIdList[i + 1] },
+            ]),
+        );
+        // debug
+        console.log(schedIdList);
+        console.log(schedIdMap);
+
+        let selectedId = schedNow.id;
 
         collector.on("collect", async (i) => {
             menuRow.components.forEach((menu) => menu.setDisabled(true));
             buttonRow.components.forEach((btn) => btn.setDisabled(true));
             i.update({ components: [menuRow, buttonRow] });
 
-            if (i.customId === "scheduleTime") {
-                currSchedId = parseInt(i.values[0]);
-            } else if (i.customId === "prev") {
-                currSchedId = currSchedId - TIME_INTERVAL;
-            } else if (i.customId === "next") {
-                currSchedId = currSchedId + TIME_INTERVAL;
-            }
+            selectedId =
+                i.customId === "scheduleTime"
+                    ? parseInt(i.values[0])
+                    : selectedId;
+            selectedId =
+                i.customId === "prev"
+                    ? schedIdMap[selectedId].prev
+                    : selectedId;
+            selectedId =
+                i.customId === "next"
+                    ? schedIdMap[selectedId].next
+                    : selectedId;
+
+            // debug
+            console.log(selectedId, schedIdMap[selectedId]);
 
             const selectedSched = schedHandler.getScheduleById(
                 schedules,
-                currSchedId,
+                selectedId,
             );
-            const editEmbed = await embedMatchBuilder(selectedSched);
+            const editEmbed = await embedBuilder(selectedSched);
 
-            const [prevSchedId, nextSchedId] = [
-                currSchedId - TIME_INTERVAL,
-                currSchedId + TIME_INTERVAL,
-            ];
             menuRow.components.forEach((menu) => menu.setDisabled(false));
             buttonRow.components[0].setDisabled(
-                !schedIdList.includes(prevSchedId),
+                schedIdMap[selectedId].prev === undefined,
             );
             buttonRow.components[1].setDisabled(
-                !schedIdList.includes(nextSchedId),
+                schedIdMap[selectedId].next === undefined,
             );
 
             await interaction.editReply({
