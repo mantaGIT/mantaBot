@@ -8,14 +8,12 @@ const { EmbedBuilder, AttachmentBuilder } = require("discord.js");
 const Canvas = require("@napi-rs/canvas");
 
 const { GAMEMODE } = require("../../../configs/gamemode.json");
-// const { stages, bosses, weapons } = require("../../../configs/ko-KR.json");
 
 module.exports = {
     /**
      * 연어런 스케줄 객체를 출력하는 임베드 메시지를 생성합니다.
      */
     async embedSalmonBuilder(schedule) {
-        console.log(schedule);
         const { stages, bosses, weapons } = JSON.parse(
             fs.readFileSync(path.join(mainPath, "configs/ko-KR.json")),
         );
@@ -50,7 +48,6 @@ module.exports = {
                 { name: "스테이지", value: `${stage}`, inline: true },
                 { name: "보스", value: `${boss}`, inline: true },
             )
-            // .addFields({ name: "보스", value: `${boss}` })
             .addFields({
                 name: "무기",
                 value: `${weapon1} / ${weapon2} / ${weapon3} / ${weapon4}`,

@@ -1,7 +1,7 @@
 const fs = require("node:fs");
 const path = require("node:path");
 // eslint-disable-next-line no-undef
-const mainPath = path.dirname(path.dirname(__dirname));
+const mainPath = path.dirname(path.dirname(path.dirname(__dirname)));
 
 const { inlineCode } = require("discord.js");
 const { EmbedBuilder } = require("discord.js");
@@ -33,7 +33,7 @@ module.exports = {
             })
             .setTimestamp()
             .setFooter({
-                text: "만타봇 관련 문의는 서버에서 만타를 찾아주세요.",
+                text: "버그 제보 대환영",
             });
 
         return { embeds: [infoEmbed] };
