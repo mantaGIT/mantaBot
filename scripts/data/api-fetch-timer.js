@@ -19,7 +19,7 @@ module.exports = {
         fetchLanguageData(langURL);
 
         console.log("Register api-fetch timer.");
-        // 홀수 시 정각 30초(ex. 09:00:30)마다 API 데이터 가져온다
+        // 한국 시 기준 홀수 시 정각 30초(ex. 09:00:30)마다 API 데이터 가져온다
         const rule = new schedule.RecurrenceRule();
         rule.hour = Array.from({ length: 24 })
             .map((x, i) => i)
