@@ -50,7 +50,7 @@ module.exports = {
             )
             .addFields({
                 name: "무기",
-                value: `${weapon1} / ${weapon2}\n${weapon3} / ${weapon4}`,
+                value: `${weapon1} / ${weapon2} / ${weapon3} / ${weapon4}`,
             })
             .setImage(`attachment://${stageImage.name}`)
             .setTimestamp()
