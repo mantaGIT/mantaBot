@@ -21,14 +21,18 @@ module.exports = {
             _.get(stages, `${x}.name`),
         );
 
-        const [stageUrl1, stageUrl2] = schedule.stages.map((x) =>
-            path.join(mainPath, `resources/images/stages/${x}.png`),
-        );
         const modeImage = await attachModeImage(schedule.mode);
-        const stagesImage = await attachStagesImage(stageUrl1, stageUrl2);
+        const stagesImage = await attachStagesImage(schedule.stages);
+
+        const color = {
+            regular: 0xd7f556,
+            challenge: 0xe2572c,
+            open: 0xe2572c,
+            x: 0x6adaa4,
+        };
 
         const scheduleInfoEmbed = new EmbedBuilder()
-            .setColor(0x568ea8)
+            .setColor(color[schedule.mode])
             .setTitle(mode)
             .setDescription(`${startTime} ~ ${endTime}`)
             .setThumbnail(`attachment://${modeImage.name}`)
@@ -42,12 +46,12 @@ module.exports = {
     },
 };
 
-async function attachModeImage(mode) {
+async function attachModeImage(fileName) {
     const canvas = Canvas.createCanvas(40, 40);
     const context = canvas.getContext("2d");
     try {
         const modeImg = await Canvas.loadImage(
-            path.join(mainPath, `resources/images/mode/${mode}.svg`),
+            path.join(mainPath, `resources/images/mode/${fileName}.svg`),
         );
         context.drawImage(modeImg, 0, 0, canvas.width, canvas.height);
     } catch (error) {
@@ -58,15 +62,18 @@ async function attachModeImage(mode) {
     });
 }
 
-async function attachStagesImage(url1, url2) {
+async function attachStagesImage(fileNames) {
     const canvas = Canvas.createCanvas(800, 200);
     const context = canvas.getContext("2d");
     try {
-        const stage1 = await Canvas.loadImage(url1);
-        const stage2 = await Canvas.loadImage(url2);
+        const [filePath1, filePath2] = fileNames.map((fileName) =>
+            path.join(mainPath, `resources/images/stages/${fileName}.png`),
+        );
+        const stageImg1 = await Canvas.loadImage(filePath1);
+        const stageImg2 = await Canvas.loadImage(filePath2);
 
-        context.drawImage(stage1, 0, 0, 400, 200);
-        context.drawImage(stage2, 400, 0, 400, 200);
+        context.drawImage(stageImg1, 0, 0, 400, 200);
+        context.drawImage(stageImg2, 400, 0, 400, 200);
     } catch (error) {
         console.error(error);
     }
