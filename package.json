@@ -4,8 +4,7 @@
   "main": "scripts/index.js",
   "scripts": {
     "start": "node scripts/index.js",
-    "deploy": "node scripts/deploy-commands.js",
-    "test": "node scripts/test.js"
+    "deploy": "node scripts/deploy-commands.js"
   },
   "author": "manta",
   "license": "ISC",
