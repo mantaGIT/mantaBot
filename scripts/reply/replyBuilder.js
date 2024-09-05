@@ -91,39 +91,51 @@ module.exports = {
         const schedIdList = schedTimeList.map((schedTime) =>
             parseInt(schedTime.id),
         );
+        const schedIdMap = Object.fromEntries(
+            schedIdList.map((id, i) => [
+                id,
+                { prev: schedIdList[i - 1], next: schedIdList[i + 1] },
+            ]),
+        );
         // debug
         console.log(schedIdList);
-        const selected = { index: 0, schedId: schedNow.id };
+        console.log(schedIdMap);
+
+        let selectedId = schedNow.id;
 
         collector.on("collect", async (i) => {
             menuRow.components.forEach((menu) => menu.setDisabled(true));
             buttonRow.components.forEach((btn) => btn.setDisabled(true));
             i.update({ components: [menuRow, buttonRow] });
 
-            if (i.customId === "scheduleTime") {
-                selected.schedId = parseInt(i.values[0]);
-                selected.index = schedIdList.findIndex(
-                    (id) => id === selected.schedId,
-                );
-            } else if (i.customId === "prev") {
-                selected.schedId = schedIdList[--selected.index];
-            } else if (i.customId === "next") {
-                selected.schedId = schedIdList[++selected.index];
-            }
+            selectedId =
+                i.customId === "scheduleTime"
+                    ? parseInt(i.values[0])
+                    : selectedId;
+            selectedId =
+                i.customId === "prev"
+                    ? schedIdMap[selectedId].prev
+                    : selectedId;
+            selectedId =
+                i.customId === "next"
+                    ? schedIdMap[selectedId].next
+                    : selectedId;
 
             // debug
-            console.log(selected.index, selected.schedId);
+            console.log(selectedId, schedIdMap[selectedId]);
 
             const selectedSched = schedHandler.getScheduleById(
                 schedules,
-                selected.schedId,
+                selectedId,
             );
             const editEmbed = await embedBuilder(selectedSched);
 
             menuRow.components.forEach((menu) => menu.setDisabled(false));
-            buttonRow.components[0].setDisabled(selected.index === 0);
+            buttonRow.components[0].setDisabled(
+                schedIdMap[selectedId].prev === undefined,
+            );
             buttonRow.components[1].setDisabled(
-                selected.index === schedIdList.length - 1,
+                schedIdMap[selectedId].next === undefined,
             );
 
             await interaction.editReply({
