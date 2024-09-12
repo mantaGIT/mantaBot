@@ -1,12 +1,11 @@
 {
   "name": "mantabot",
-  "version": "0.0.4",
-  "main": "src/index.js",
+  "version": "0.1.0",
+  "main": "scripts/index.js",
   "scripts": {
-    "start": "node src/index.js",
-    "deploy": "node src/deploy-commands.js",
-    "path": "node src/set-paths.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node scripts/index.js",
+    "deploy": "node scripts/deploy-commands.js",
+    "test": "node scripts/test.js"
   },
   "author": "manta",
   "license": "ISC",
@@ -17,6 +16,10 @@
     "globals": "^15.9.0"
   },
   "dependencies": {
-    "discord.js": "^14.15.3"
+    "@napi-rs/canvas": "^0.1.53",
+    "discord.js": "^14.15.3",
+    "dotenv": "^16.4.5",
+    "lodash": "^4.17.21",
+    "node-schedule": "^2.1.1"
   }
 }

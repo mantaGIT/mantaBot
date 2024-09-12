@@ -1,5 +1,9 @@
 const { Events } = require('discord.js');
 
+const process = require('node:process');
+require('dotenv').config();
+const log = require(process.env.LOGMSG);
+
 module.exports = {
 	name: Events.InteractionCreate,
 	async execute(interaction) {
@@ -13,7 +17,7 @@ module.exports = {
 		}
 
 		try {
-			console.log(`[${new Date(Date.now())}] call /${interaction.commandName} command`);
+			log.printLog(`Call /${interaction.commandName} command by @${interaction.user.username}.`);
 			await command.execute(interaction);
 		}
 		catch (error) {
