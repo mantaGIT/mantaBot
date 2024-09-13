@@ -3,19 +3,18 @@ const path = require('node:path');
 // eslint-disable-next-line no-undef
 const mainPath = path.dirname(path.dirname(__dirname));
 
-const { createScheduleData } = require(path.join(mainPath, 'scripts/data/schedule-data-generator.js'));
 const { GAMEMODE } = require(path.join(mainPath, 'scripts/data/schema/api-data-mapping.js'));
-
+const schedHandler = require(path.join(mainPath, 'scripts/data/schedule-data-handler.js'));
 
 module.exports = {
 	fetchApiData(url) {
 		fetch(url)
 			.then(response => response.json())
 			.then(apiData => {
-				createScheduleData(apiData.data, GAMEMODE.REGULAR);
-				createScheduleData(apiData.data, GAMEMODE.OPEN);
-				createScheduleData(apiData.data, GAMEMODE.CHALLENGE);
-				createScheduleData(apiData.data, GAMEMODE.X);
+				schedHandler.createScheduleJsonFile(apiData.data, GAMEMODE.REGULAR);
+				schedHandler.createScheduleJsonFile(apiData.data, GAMEMODE.OPEN);
+				schedHandler.createScheduleJsonFile(apiData.data, GAMEMODE.CHALLENGE);
+				schedHandler.createScheduleJsonFile(apiData.data, GAMEMODE.X);
 				console.log(`Update schedule data files by gamemode from ${url}.`);
 			})
 			.catch((error) => {
@@ -24,8 +23,12 @@ module.exports = {
 	},
 	createFetchApiTimer(url) {
 		console.log('Register api-fetch timer.');
-		// 홀수 시 3분마다 API 데이터 가져옴
-		schedule.scheduleJob('3 1-23/2 * * *', () => {
+		// 홀수 시 1분마다 API 데이터 가져옴
+		const rule = new schedule.RecurrenceRule();
+		rule.hour = Array.from({ length: 24 }).map((x, i) => i).filter((x) => x % 2 === 0);
+		rule.minute = 1;
+		rule.tz = 'Etc/UTC';
+		schedule.scheduleJob(rule, () => {
 			this.fetchApiData(url);
 		});
 	},
