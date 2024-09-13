@@ -14,16 +14,16 @@ module.exports = {
 		}
 
 		try {
-			console.log(`Call /${interaction.commandName} command by @${interaction.user.username}.`);
+			console.log(`Call /${interaction.commandName} command in ${interaction.member.guild.name} by @${interaction.user.username}.`);
 			await command.execute(interaction);
 		}
 		catch (error) {
 			console.error(error);
 			if (interaction.replied || interaction.deferred) {
-				await interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
+				await interaction.followUp({ content: '명령어 실행에 에러가 발생했습니다.', ephemeral: true });
 			}
 			else {
-				await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+				await interaction.reply({ content: '명령어 실행에 에러가 발생했습니다.', ephemeral: true });
 			}
 		}
 	},
