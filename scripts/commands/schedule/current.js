@@ -13,7 +13,8 @@ const _ = require('lodash');
 const { SlashCommandBuilder, EmbedBuilder, userMention } = require('discord.js');
 
 const { GAMEMODE } = require(path.join(mainPath, 'scripts/data/schema/api-data-mapping.js'));
-const { attachStages, attachMode } = require(path.join(mainPath, 'scripts/data/image-builder.js'));
+const { attachStages, attachMode } = require(path.join(mainPath, 'scripts/data/img-attachmentBuilder.js'));
+
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -40,6 +41,7 @@ module.exports = {
 			const schedules = JSON.parse(schedulesFile);
 
 			const timeNow = Date.now();
+			// const curr = schedules[0];
 			const curr = schedules.find((schedule) => timeNow >= new Date(schedule.startTime) && timeNow < new Date(schedule.endTime));
 			const dateFormat = {
 				month: '2-digit',
@@ -61,7 +63,7 @@ module.exports = {
 			const modeImg = await attachMode(curr.mode);
 
 			const scheduleInfoEmbed = new EmbedBuilder()
-				.setColor(0x0099FF)
+				.setColor(0x568ea8)
 				.setTitle(mode)
 				.setDescription(`${startTime} ~ ${endTime}`)
 				.setThumbnail(`attachment://${modeImg.name}`)
