@@ -1,12 +1,10 @@
-const process = require('node:process');
-require('dotenv').config();
-
 const schedule = require('node-schedule');
+const path = require('node:path');
+// eslint-disable-next-line no-undef
+const mainPath = path.dirname(path.dirname(__dirname));
 
-const { createScheduleData } = require('./schedule-data.js');
-
-const { GAMEMODE } = require(process.env.API_DATA_SCHEMA);
-const log = require(process.env.LOGMSG);
+const { createScheduleData } = require(path.join(mainPath, 'scripts/data/data-extracting.js'));
+const { GAMEMODE } = require(path.join(mainPath, 'scripts/data/schema/api-data-mapping.js'));
 
 
 module.exports = {
@@ -18,14 +16,14 @@ module.exports = {
 				createScheduleData(apiData.data, GAMEMODE.OPEN);
 				createScheduleData(apiData.data, GAMEMODE.CHALLENGE);
 				createScheduleData(apiData.data, GAMEMODE.X);
-				log.printLog('Update schedule data files by gamemode.');
+				console.log(`Update schedule data files by gamemode from ${url}.`);
 			})
 			.catch((error) => {
-				log.printError(error);
+				console.error(error);
 			});
 	},
 	createFetchApiTimer(url) {
-		log.printLog('Register fetch-api-data timer.');
+		console.log('Register fetch-api-data timer.');
 		// 홀수 시 3분마다 API 데이터 가져옴
 		schedule.scheduleJob('3 1-23/2 * * *', () => {
 			this.fetchApiData(url);
