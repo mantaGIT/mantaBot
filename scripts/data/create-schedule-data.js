@@ -11,22 +11,26 @@ const { Schedule } = require(path.join(mainPath, 'scripts/data/schema/schedule-s
 function createStageImages(stageObj) {
 	const imgURL = stageObj.image.url;
 	const imgPath = path.join(mainPath, `resources/images/stages/${stageObj.id}.png`);
-	fs.access(imgPath, fs.constants.F_OK, (err) => {
-		if (err) {
+
+	fs.stat(imgPath, (error, stats) => {
+		if (error) {
+		  console.error(error);
+		}
+		else if (stats.size === 0) {
 			console.log(`${stageObj.id} stage image is not exist. create a image`);
 			fetch(imgURL)
 				.then(response => response.arrayBuffer())
 				.then(buffer => {
 					fs.writeFileSync(imgPath, Buffer.from(buffer));
 				})
-				.catch((error) => {
-					console.error(error);
+				.catch((err) => {
+					console.error(err);
 				});
 		}
 		else {
 			console.log(`${stageObj.id} stage image is exist.`);
 		}
-	});
+	  });
 };
 
 module.exports = {
