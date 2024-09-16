@@ -1,17 +1,14 @@
-const path = require('node:path');
-// eslint-disable-next-line no-undef
-const mainPath = path.dirname(path.dirname(path.dirname(__dirname)));
 const { SlashCommandBuilder } = require('discord.js');
-const { ButtonBuilder, ButtonStyle, ActionRowBuilder } = require('discord.js');
+const { ButtonBuilder, ButtonStyle, ActionRowBuilder, ComponentType } = require('discord.js');
 
-const { GAMEMODE } = require(path.join(mainPath, 'scripts/data/schema/api-data-mapping.js'));
-const schedHandler = require(path.join(mainPath, 'scripts/data/schedule-data-handler.js'));
-const embedSchedBuilder = require(path.join(mainPath, 'scripts/reply-builders/embed-schedule-builder.js'));
+const { GAMEMODE } = require('../../../scripts/data/schema/api-data-mapping.js');
+const schedHandler = require('../../../scripts/data/schedule-data-handler.js');
+const schedEmbedBuilder = require('../../../scripts/reply-builders/schedule-embedBuilder.js');
 
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('현재스케줄')
+		.setName('스케줄')
 		.setDescription('현재 스플래툰3 스케줄 정보를 알려줍니다.')
 		.addStringOption(option =>
 			option.setName('mode')
@@ -26,48 +23,75 @@ module.exports = {
 	async execute(interaction) {
 		await interaction.deferReply();
 
-		const optionValue = GAMEMODE[interaction.options.getString('mode')];
-		const schedules = schedHandler.loadScheduleJson(optionValue);
+		const option = GAMEMODE[interaction.options.getString('mode')];
+		const schedules = schedHandler.loadScheduleJson(option);
 		if (schedules === undefined) throw new Error('cannot load schedule json file.');
 
-		const scheduleNow = schedHandler.getScheduleNow(schedules);
-		if (scheduleNow === undefined) throw new Error('cannot find schedule now.');
+		const schedNow = schedHandler.getScheduleNow(schedules);
+		if (schedNow === undefined) throw new Error('cannot find schedule now.');
 
-		const embedSched = await embedSchedBuilder.embedScheduleBuilder(scheduleNow);
+		const schedEmbed = await schedEmbedBuilder.embedScheduleBuilder(schedNow);
+
+		const prev = new ButtonBuilder()
+			.setCustomId('prev')
+			.setLabel('이전 스케줄')
+			.setStyle(ButtonStyle.Primary)
+			.setDisabled(true);
 
 		const next = new ButtonBuilder()
 			.setCustomId('next')
-			.setLabel('다음 스케줄 확인하기')
+			.setLabel('다음 스케줄')
 			.setStyle(ButtonStyle.Primary);
 
-		const actionRow = new ActionRowBuilder().addComponents(next);
+		const actionRow = new ActionRowBuilder()
+			.addComponents(prev, next);
 
 		const response = await interaction.editReply({
-			embeds: embedSched.embeds,
-			files: embedSched.files,
+			embeds: schedEmbed.embeds,
+			files: schedEmbed.files,
 			components: [ actionRow ],
 		});
 
-		const collectorFilter = i => i.user.id === interaction.user.id;
+		const minNode = schedNow.node;
+		const maxNode = schedules.at(-1).node;
+		let currNode = schedNow.node;
 
-		try {
-			// 버튼 응답 가능 시간 : 3분 (time: ms) => 3 * 60 * 1000
-			const clickedButton = await response.awaitMessageComponent({ filter: collectorFilter, time: 180_000 });
+		// debug
+		// console.log(new Date(Date.now()));
 
-			if (clickedButton.customId === 'next') {
-				const nextSched = schedHandler.getScheduleByNode(schedules, scheduleNow.node + 1);
-				const editEmbed = await embedSchedBuilder.embedScheduleBuilder(nextSched);
-				actionRow.components[0].setDisabled(true);
-				await clickedButton.update({
-					embeds: editEmbed.embeds,
-					files: editEmbed.files,
-					components: [ actionRow ],
-				});
+		// 응답 가능 시간 : 10분 (time: ms) => 10 * 60 * 1000
+		const collector = response.createMessageComponentCollector({
+			componentType: ComponentType.Button,
+			time: 600_000,
+		});
+
+		collector.on('collect', async i => {
+			if (i.member.id !== interaction.user.id) {
+				return i.reply({ content: '버튼 사용은 명령어 사용자만 가능합니다.', ephemeral: true });
 			}
-		}
-		// eslint-disable-next-line no-unused-vars
-		catch (error) {
-			console.log('/현재스케줄 command button timeout.');
-		};
+			else if (i.customId === 'prev') {
+				currNode = currNode - 1;
+			}
+			else if (i.customId === 'next') {
+				currNode = currNode + 1;
+			}
+			actionRow.components[0].setDisabled(currNode === minNode);
+			actionRow.components[1].setDisabled(currNode === maxNode);
+
+			const selectedSched = schedHandler.getScheduleByNode(schedules, currNode);
+			const editEmbed = await schedEmbedBuilder.embedScheduleBuilder(selectedSched);
+
+			i.deferUpdate();
+			await interaction.editReply({
+				embeds: editEmbed.embeds,
+				files: editEmbed.files,
+				components: [ actionRow ],
+			});
+		});
+		collector.on('end', () => {
+			// debug
+			// console.log(new Date(Date.now()));
+			interaction.editReply({ content: '스케줄 선택 가능 시간이 만료되었습니다.' });
+		});
 	},
 };
