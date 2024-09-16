@@ -1,10 +1,7 @@
 const schedule = require('node-schedule');
-const path = require('node:path');
-// eslint-disable-next-line no-undef
-const mainPath = path.dirname(path.dirname(__dirname));
 
-const { GAMEMODE } = require(path.join(mainPath, 'scripts/data/schema/api-data-mapping.js'));
-const schedHandler = require(path.join(mainPath, 'scripts/data/schedule-data-handler.js'));
+const { GAMEMODE } = require('../../scripts/data/schema/api-data-mapping.js');
+const schedHandler = require('../../scripts/data/schedule-data-handler.js');
 
 module.exports = {
 	fetchApiData(url) {
