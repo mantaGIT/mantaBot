@@ -1,13 +1,9 @@
-const path = require('node:path');
-// eslint-disable-next-line no-undef
-const mainPath = path.dirname(path.dirname(path.dirname(__dirname)));
-
 const { SlashCommandBuilder, ActionRowBuilder } = require('discord.js');
 const { StringSelectMenuBuilder, StringSelectMenuOptionBuilder, ComponentType } = require('discord.js');
 
-const { GAMEMODE } = require(path.join(mainPath, 'scripts/data/schema/api-data-mapping.js'));
-const schedHandler = require(path.join(mainPath, 'scripts/data/schedule-data-handler.js'));
-const embedSchedBuilder = require(path.join(mainPath, 'scripts/reply-builders/embed-schedule-builder.js'));
+const { GAMEMODE } = require('../../../scripts/data/schema/api-data-mapping.js');
+const schedHandler = require('../../../scripts/data/schedule-data-handler.js');
+const schedEmbedBuilder = require('../../reply-builders/schedule-embedBuilder.js');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -22,7 +18,7 @@ module.exports = {
 		const scheduleNow = schedHandler.getScheduleNow(schedules);
 		if (scheduleNow === undefined) throw new Error('cannot find schedule now.');
 
-		const embedSched = await embedSchedBuilder.embedScheduleBuilder(scheduleNow);
+		const schedEmbed = await schedEmbedBuilder.embedScheduleBuilder(scheduleNow);
 
 		// 스케줄의 시작 시간만 표시, 2024년 08월 20일 21:00와 같은 형식
 		const dateFormat = {
@@ -31,30 +27,33 @@ module.exports = {
 			hour12: false,
 			timeZone: 'Asia/Seoul',
 		};
-		const scheduleTimeList = schedules.map((schedule) => {
+		const schedTimeList = schedules.map((schedule) => {
 			const startTime = new Intl.DateTimeFormat('ko-KR', dateFormat).format(new Date(schedule.startTime));
 			return { node: String(schedule.node), time: `${startTime}` };
 		}).filter((schedTime) => schedTime.node >= scheduleNow.node);
 
-		const scheduleTimeMenu = new StringSelectMenuBuilder()
+		const schedTimeMenu = new StringSelectMenuBuilder()
 			.setCustomId('scheduleTime')
 			.setPlaceholder('스케줄 시작 시간을 선택해주세요.')
-			.addOptions(scheduleTimeList.map((schedTime) => {
+			.addOptions(schedTimeList.map((schedTime) => {
 				return new StringSelectMenuOptionBuilder()
 					.setLabel(schedTime.time)
 					.setValue(schedTime.node);
 			}));
 
-		const actionRow = new ActionRowBuilder().addComponents(scheduleTimeMenu);
+		const actionRow = new ActionRowBuilder().addComponents(schedTimeMenu);
 
 		const response = await interaction.editReply({
-			embeds: embedSched.embeds,
-			files: embedSched.files,
+			embeds: schedEmbed.embeds,
+			files: schedEmbed.files,
 			components: [ actionRow ],
 		});
 
 		// 응답 가능 시간 : 10분 (time: ms) => 10 * 60 * 1000
-		const collector = response.createMessageComponentCollector({ componentType: ComponentType.StringSelect, time: 600_000 });
+		const collector = response.createMessageComponentCollector({
+			componentType: ComponentType.StringSelect,
+			time: 600_000,
+		});
 
 		collector.on('collect', async i => {
 			if (i.member.id !== interaction.user.id) {
@@ -62,8 +61,9 @@ module.exports = {
 			}
 			if (i.customId === 'scheduleTime') {
 				const selectedSched = schedHandler.getScheduleByNode(schedules, parseInt(i.values[0]));
-				const editEmbed = await embedSchedBuilder.embedScheduleBuilder(selectedSched);
+				const editEmbed = await schedEmbedBuilder.embedScheduleBuilder(selectedSched);
 				i.deferUpdate();
+				console.log(i);
 				await interaction.editReply(editEmbed);
 			}
 		});
