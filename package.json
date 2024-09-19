@@ -1,6 +1,6 @@
 {
   "name": "mantabot",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "main": "scripts/index.js",
   "scripts": {
     "start": "node scripts/index.js",
