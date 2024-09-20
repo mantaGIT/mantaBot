@@ -58,8 +58,6 @@ function fetchScheduleData(url) {
  * 한글 패치 데이터 요청하고 처리한다.
  */
 function fetchLanguageData(url) {
-    // debug - local test
-    if (url === "undefined") return;
     fetch(url)
         .then((response) => response.json())
         .then((apiData) => {
