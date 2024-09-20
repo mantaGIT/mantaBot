@@ -1,26 +1,23 @@
 const schedule = require("node-schedule");
 
-const { GAMEMODE } = require("../../scripts/data/schema/api-data-mapping.js");
-const schedHandler = require("../../scripts/data/schedule-data-handler.js");
+const { GAMEMODE } = require("../../configs/gamemode.json");
+const schedHandler = require("./schedule-data-handler.js");
 
 module.exports = {
+    /**
+     * API 호출 및 API 데이터를 처리한다.
+     */
     fetchApiData(url) {
         fetch(url)
             .then((response) => response.json())
             .then((apiData) => {
-                schedHandler.createScheduleJsonFile(
-                    apiData.data,
-                    GAMEMODE.REGULAR,
-                );
-                schedHandler.createScheduleJsonFile(
-                    apiData.data,
-                    GAMEMODE.OPEN,
-                );
-                schedHandler.createScheduleJsonFile(
-                    apiData.data,
-                    GAMEMODE.CHALLENGE,
-                );
-                schedHandler.createScheduleJsonFile(apiData.data, GAMEMODE.X);
+                // update match schedules
+                schedHandler.createSchedulesFile(apiData, GAMEMODE.REGULAR);
+                schedHandler.createSchedulesFile(apiData, GAMEMODE.CHALLENGE);
+                schedHandler.createSchedulesFile(apiData, GAMEMODE.OPEN);
+                schedHandler.createSchedulesFile(apiData, GAMEMODE.X);
+                // update salmon run schedules
+                schedHandler.createSchedulesFile(apiData, GAMEMODE.SALMON);
                 console.log(
                     `Update schedule data files by gamemode from ${url}.`,
                 );
@@ -29,9 +26,12 @@ module.exports = {
                 console.error(error);
             });
     },
+    /**
+     * API 호출 모듈을 원하는 시간마다 동작하도록 스케줄링한다.
+     */
     createFetchApiTimer(url) {
         console.log("Register api-fetch timer.");
-        // 홀수 시 1분마다 API 데이터 가져옴
+        // 홀수 시 1분마다 API 데이터 가져온다
         const rule = new schedule.RecurrenceRule();
         rule.hour = Array.from({ length: 24 })
             .map((x, i) => i)

@@ -5,9 +5,9 @@ const replyBuilder = require("../../reply/replyBuilder.js");
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName("엑매")
-        .setDescription("스플래툰3 X 매치 스케줄을 알려줍니다."),
+        .setName("연어")
+        .setDescription("스플래툰3 연어런 스케줄을 알려줍니다."),
     async execute(interaction) {
-        await replyBuilder.scheduleReply(interaction, GAMEMODE.X);
+        await replyBuilder.scheduleReply(interaction, GAMEMODE.SALMON);
     },
 };
