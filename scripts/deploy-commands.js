@@ -1,5 +1,4 @@
 const process = require("node:process");
-// require("dotenv").config();
 
 const fs = require("node:fs");
 const path = require("node:path");

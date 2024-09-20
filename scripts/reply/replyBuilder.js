@@ -7,19 +7,17 @@ const {
 } = require("discord.js");
 
 const schedHandler = require("../data/schedule-data-handler.js");
-const schedEmbedBuilder = require("./schedule-embedBuilder.js");
-const botInfoEmbedBuilder = require("../../scripts/reply-builders/botInfo-embedBuilder.js");
+const { GAMEMODE } = require("../../configs/gamemode.json");
+const { embedMatchBuilder } = require("./embeds/match-embedBuilder.js");
+const { embedSalmonBuilder } = require("./embeds/salmon-embedBuilder.js");
+const { embedInfoBuilder } = require("./embeds/info-embedBuilder.js");
 
 module.exports = {
-    async botInfoReply(interaction) {
-        await interaction.deferReply({ ephemeral: true });
-        const botInfoEmbed = await botInfoEmbedBuilder.botInfoEmbedBuilder();
-        await interaction.editReply(botInfoEmbed);
-    },
+    // ex. gamemode = GAMEMODE.REGULAR
     async scheduleReply(interaction, gamemode) {
         await interaction.deferReply();
 
-        const schedules = schedHandler.loadScheduleJson(gamemode);
+        const schedules = schedHandler.loadSchedules(gamemode);
         if (schedules === undefined)
             throw new Error("cannot load schedule json file.");
 
@@ -27,8 +25,12 @@ module.exports = {
         if (schedNow === undefined)
             throw new Error("cannot find schedule now.");
 
-        const schedEmbed =
-            await schedEmbedBuilder.embedScheduleBuilder(schedNow);
+        const embedBuilder =
+            gamemode.mode === GAMEMODE.SALMON.mode
+                ? embedSalmonBuilder
+                : embedMatchBuilder;
+
+        const schedEmbed = await embedBuilder(schedNow);
 
         // 스케줄의 시작 시간만 표시, 2024년 08월 20일 21:00와 같은 형식
         const dateFormat = {
@@ -43,9 +45,9 @@ module.exports = {
                     "ko-KR",
                     dateFormat,
                 ).format(new Date(schedule.startTime));
-                return { node: String(schedule.node), time: `${startTime}` };
+                return { id: String(schedule.id), time: `${startTime}` };
             })
-            .filter((schedTime) => schedTime.node >= schedNow.node);
+            .filter((schedTime) => schedTime.id >= schedNow.id);
 
         const schedTimeMenu = new StringSelectMenuBuilder()
             .setCustomId("scheduleTime")
@@ -54,7 +56,7 @@ module.exports = {
                 schedTimeList.map((schedTime) => {
                     return new StringSelectMenuOptionBuilder()
                         .setLabel(schedTime.time)
-                        .setValue(schedTime.node);
+                        .setValue(schedTime.id);
                 }),
             );
 
@@ -86,38 +88,48 @@ module.exports = {
             time: 600_000,
         });
 
-        let currNode = schedNow.node;
-        const schedNodeList = schedTimeList.map((schedTime) =>
-            parseInt(schedTime.node),
+        const schedIdList = schedTimeList.map((schedTime) =>
+            parseInt(schedTime.id),
         );
+        const schedIdMap = Object.fromEntries(
+            schedIdList.map((id, i) => [
+                id,
+                { prev: schedIdList[i - 1], next: schedIdList[i + 1] },
+            ]),
+        );
+
+        let selectedId = schedNow.id;
 
         collector.on("collect", async (i) => {
             menuRow.components.forEach((menu) => menu.setDisabled(true));
             buttonRow.components.forEach((btn) => btn.setDisabled(true));
             i.update({ components: [menuRow, buttonRow] });
 
-            if (i.customId === "scheduleTime") {
-                currNode = parseInt(i.values[0]);
-            } else if (i.customId === "prev") {
-                currNode = currNode - 1;
-            } else if (i.customId === "next") {
-                currNode = currNode + 1;
-            }
+            selectedId =
+                i.customId === "scheduleTime"
+                    ? parseInt(i.values[0])
+                    : selectedId;
+            selectedId =
+                i.customId === "prev"
+                    ? schedIdMap[selectedId].prev
+                    : selectedId;
+            selectedId =
+                i.customId === "next"
+                    ? schedIdMap[selectedId].next
+                    : selectedId;
 
-            const selectedSched = schedHandler.getScheduleByNode(
+            const selectedSched = schedHandler.getScheduleById(
                 schedules,
-                currNode,
+                selectedId,
             );
-            const editEmbed =
-                await schedEmbedBuilder.embedScheduleBuilder(selectedSched);
+            const editEmbed = await embedBuilder(selectedSched);
 
-            const [prevNode, nextNode] = [currNode - 1, currNode + 1];
             menuRow.components.forEach((menu) => menu.setDisabled(false));
             buttonRow.components[0].setDisabled(
-                schedNodeList.find((node) => node === prevNode) === undefined,
+                schedIdMap[selectedId].prev === undefined,
             );
             buttonRow.components[1].setDisabled(
-                schedNodeList.find((node) => node === nextNode) === undefined,
+                schedIdMap[selectedId].next === undefined,
             );
 
             await interaction.editReply({
@@ -131,5 +143,10 @@ module.exports = {
                 content: "스케줄 선택 가능 시간이 만료되었습니다.",
             });
         });
+    },
+    async infoReply(interaction) {
+        await interaction.deferReply({ ephemeral: true });
+        const botInfoEmbed = await embedInfoBuilder();
+        await interaction.editReply(botInfoEmbed);
     },
 };
