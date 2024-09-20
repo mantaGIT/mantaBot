@@ -97,9 +97,6 @@ module.exports = {
                 { prev: schedIdList[i - 1], next: schedIdList[i + 1] },
             ]),
         );
-        // debug
-        console.log(schedIdList);
-        console.log(schedIdMap);
 
         let selectedId = schedNow.id;
 
@@ -120,9 +117,6 @@ module.exports = {
                 i.customId === "next"
                     ? schedIdMap[selectedId].next
                     : selectedId;
-
-            // debug
-            console.log(selectedId, schedIdMap[selectedId]);
 
             const selectedSched = schedHandler.getScheduleById(
                 schedules,
