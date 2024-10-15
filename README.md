@@ -41,19 +41,9 @@
 >
 > 프로젝트 실행을 위해서는 `디스코드 봇`이 필요합니다.
 >
+> 디스코드 봇의 `Client ID`와 `Bot token`을 `.env` 환경변수로 설정해야 합니다.
+>
 > [Discord develop portal](https://discord.com/developers/applications)에서 봇 생성 후 서버에 초대하여 준비합니다.
-
-디스코드 봇의 `Client ID`와 `Bot token`을 환경변수로 설정해야 합니다.
-
-프로젝트 루트 디렉토리에 `.env` 파일을 생성 후 다음과 같이 설정합니다.
-
-```env
-TOKEN=(place a bot token in this line)
-CLIENT_ID=(place a client ID in this line)
-
-SCHED_URL=https://splatoon3.ink/data/schedules.json
-LANG_URL=https://splatoon3.ink/data/locale/ko-KR.json
-```
 
 `index.js`와 `deploy-commands.js`에서 주석 처리된 아래 코드를 활성화합니다.
 ```js
