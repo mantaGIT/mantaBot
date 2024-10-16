@@ -7,6 +7,8 @@
 > 데이터 출처 : [splatoon3.ink](https://splatoon3.ink/) / 
 [splatoon3.ink Data access](https://github.com/misenhower/splatoon3.ink/wiki/Data-Access)
 
+[![My Skills](https://skillicons.dev/icons?i=js,nodejs,discordjs)](https://skillicons.dev)
+
 ## Description
 
 현재 스플래툰3의 기본 `5가지` 게임 모드에 대한 스케줄 확인 명령어를 지원합니다.
@@ -32,8 +34,6 @@
 ## Project Setup
 
 다음 과정을 따라 본 프로젝트를 직접 실행시켜볼 수 있습니다.
-
-> 본 프로젝트는 [Discord.js](https://github.com/discordjs/discord.js?tab=readme-ov-file)를 기반으로 진행하였습니다.
 
 ### 사전 설정
 
